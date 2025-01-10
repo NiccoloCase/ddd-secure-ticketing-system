@@ -1,14 +1,11 @@
 package org.swe;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import org.swe.helpers.Config;
 import org.swe.helpers.JWTUtility;
 
 import java.util.HashMap;
 import java.util.Map;
-
-
 
 
 public class Main {

@@ -28,14 +28,12 @@ public class Main {
 
         // Esempio di validazione e lettura dei claims
         try {
-            Claims parsedClaims = JWTUtility.validateToken(token);
+            Object parsedClaims = JWTUtility.validateToken(token);
             System.out.println("Token valid. Claims: " + parsedClaims);
         } catch (JwtException e) {
             System.out.println("Invalid token: " + e.getMessage());
         }
 
-        // Estrazione di un claim specifico
-        String username = (String) JWTUtility.getClaim(token, "username");
-        System.out.println("Username from token: " + username);
+
     }
 }

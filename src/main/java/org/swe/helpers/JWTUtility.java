@@ -6,22 +6,15 @@ import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 
-public class JWTUtility {
-    private final Key secretKey;
-    private final long expirationTime; // Tempo di validità in millisecondi
 
-    public JWTUtility(String secret, long expirationTime) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes()); // Genera la chiave a partire da una stringa segreta
-        this.expirationTime = expirationTime;
-    }
+public class JWTUtility {
+    private static final long expirationTime = 3600000; // 1 ora (in millisecondi)
+    private static final Key secretKey = Keys.hmacShaKeyFor(Config.JWT_SECRET.getBytes());
 
     /**
-     * Crea un token JWT con i claims forniti
-     *
-     * @param claims Map con i dati da includere nel token
-     * @return Stringa del token generato
+     * Generate a JWT token
      */
-    public String generateToken(Map<String, Object> claims) {
+    public static String generateToken(Map<String, Object> claims) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date())
@@ -31,13 +24,9 @@ public class JWTUtility {
     }
 
     /**
-     * Valida un token JWT e restituisce i claims
-     *
-     * @param token Token JWT da validare
-     * @return Claims contenuti nel token
-     * @throws JwtException se il token non è valido
+     * Validate a JWT token
      */
-    public Claims validateToken(String token) {
+    public static Claims validateToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
@@ -46,13 +35,9 @@ public class JWTUtility {
     }
 
     /**
-     * Estrae un claim specifico dal token
-     *
-     * @param token Token JWT
-     * @param claimKey Chiave del claim da estrarre
-     * @return Valore del claim
+     * Extract a claim from a JWT token
      */
-    public Object getClaim(String token, String claimKey) {
+    public static Object getClaim(String token, String claimKey) {
         Claims claims = validateToken(token);
         return claims.get(claimKey);
     }

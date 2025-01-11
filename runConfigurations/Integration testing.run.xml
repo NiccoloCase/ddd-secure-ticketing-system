@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Integration testing" type="JUnit" factoryName="JUnit">
+    <module name="SWE" />
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="pattern" />
+    <patterns>
+      <pattern testClass="^.*IT$" />
+    </patterns>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -14,7 +14,6 @@ public class MyValidator<T> {
             this.validator = factory.getValidator();
         }
     }
-
     public MyValidationResult<T> validate(T dto) {
         Set<ConstraintViolation<T>> violations = validator.validate(dto);
         return new MyValidationResult<>(violations);

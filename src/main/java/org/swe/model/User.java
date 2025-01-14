@@ -1,4 +1,4 @@
-package org.swe.domain;
+package org.swe.model;
 
 public class User {
     private String name;

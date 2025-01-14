@@ -12,6 +12,23 @@
         <defaultGoal>
             install
         </defaultGoal>
+
+        <plugins>
+            <!-- Plugin JaCoCo per la copertura del codice -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version> <!-- Usa l'ultima versione disponibile -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>  <!-- Aggiunge il "JaCoCo Agent" per raccogliere i dati di copertura -->
+                            <goal>report</goal>  <!-- Crea un report dopo i test -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <properties>
@@ -57,6 +74,7 @@
             <version>5.11.4</version>
             <scope>test</scope>
         </dependency>
+
 
 
     </dependencies>

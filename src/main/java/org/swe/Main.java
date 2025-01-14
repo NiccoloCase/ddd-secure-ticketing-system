@@ -1,12 +1,8 @@
 package org.swe;
-
-import io.jsonwebtoken.JwtException;
+import org.swe.core.dto.CreateUserDTO;
+import org.swe.core.validation.MyValidationResult;
+import org.swe.core.validation.MyValidator;
 import org.swe.helpers.Config;
-import org.swe.helpers.JWTUtility;
-
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class Main {
     public static void main(String[] args) {
@@ -16,19 +12,19 @@ public class Main {
 
         System.out.println("Hello world!");
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("username", "john.doe");
-        claims.put("role", "admin");
 
-        String token = JWTUtility.generateToken(claims);
-        System.out.println("Generated Token: " + token);
+        MyValidator<CreateUserDTO> validator = new MyValidator<>();
+        CreateUserDTO user = new CreateUserDTO("A", "B", "invalid-email", "password");
+        MyValidationResult<CreateUserDTO> result = validator.validate(user);
 
-        // Esempio di validazione e lettura dei claims
-        try {
-            Object parsedClaims = JWTUtility.validateToken(token);
-            System.out.println("Token valid. Claims: " + parsedClaims);
-        } catch (JwtException e) {
-            System.out.println("Invalid token: " + e.getMessage());
+
+        if (result.hasErrors()) {
+
+            for (MyValidationResult.ValidationError error : result.getErrors()) {
+                System.out.println("Campo: " + error.field());
+                System.out.println("Messaggio: " + error.message());
+                System.out.println("Valore non valido: " + error.invalidValue());
+            }
         }
 
 

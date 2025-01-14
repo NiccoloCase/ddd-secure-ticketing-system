@@ -14,16 +14,16 @@
         </defaultGoal>
 
         <plugins>
-            <!-- Plugin JaCoCo per la copertura del codice -->
+            <!--JaCoCo -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version> <!-- Usa l'ultima versione disponibile -->
+                <version>0.8.12</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>prepare-agent</goal>  <!-- Aggiunge il "JaCoCo Agent" per raccogliere i dati di copertura -->
-                            <goal>report</goal>  <!-- Crea un report dopo i test -->
+                            <goal>prepare-agent</goal>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -74,9 +74,24 @@
             <version>5.11.4</version>
             <scope>test</scope>
         </dependency>
-
-
+        <!-- jakarta -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <!-- Jakarta EL -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <!-- Hibernate Validator -->
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>8.0.0.Final</version>
+        </dependency>
 
     </dependencies>
-
 </project>

@@ -1,4 +1,4 @@
-package org.swe;
+package org.swe.business;
 
 public class UserController {
 }

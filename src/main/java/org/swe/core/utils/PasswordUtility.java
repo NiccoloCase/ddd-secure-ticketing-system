@@ -1,8 +1,8 @@
-package org.swe.helpers;
+package org.swe.core.utils;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-public class PasswordManager {
+public class PasswordUtility {
 
 
     public static String hashPassword(String password) {

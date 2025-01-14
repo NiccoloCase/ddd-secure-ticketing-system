@@ -1,10 +1,11 @@
-package org.swe.helpers;
+package org.swe.core.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.swe.core.Config;
 
 import javax.crypto.SecretKey;
 import java.util.Date;

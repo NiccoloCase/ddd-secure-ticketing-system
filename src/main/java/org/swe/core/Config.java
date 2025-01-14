@@ -1,4 +1,4 @@
-package org.swe.helpers;
+package org.swe.core;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class Config {

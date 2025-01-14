@@ -1,8 +1,9 @@
-package org.swe.helpers;
+package org.swe.core.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import org.swe.core.Config;
 
 import javax.crypto.SecretKey;
 import java.util.Date;

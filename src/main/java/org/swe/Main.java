@@ -2,7 +2,7 @@ package org.swe;
 import org.swe.core.dto.CreateUserDTO;
 import org.swe.core.validation.MyValidationResult;
 import org.swe.core.validation.MyValidator;
-import org.swe.helpers.Config;
+import org.swe.core.Config;
 
 public class Main {
     public static void main(String[] args) {

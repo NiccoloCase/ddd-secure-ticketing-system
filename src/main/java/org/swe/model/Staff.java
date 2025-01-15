@@ -4,8 +4,8 @@ public class Staff  extends User {
 
     private int eventId;
 
-    public Staff(String name, String surname, String passwordHash, String email, int eventId) {
-        super(name, surname, passwordHash, email);
+    public Staff(String name, String surname, String passwordHash, String email, int eventId, int id) {
+        super(name, surname, passwordHash, email, id);
         this.eventId = eventId;
     }
 

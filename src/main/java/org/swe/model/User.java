@@ -5,12 +5,14 @@ public class User {
     private String surname;
     private String passwordHash;
     private String email;
+    private int id;
 
-    public User(String name, String surname, String passwordHash, String email) {
+    public User(String name, String surname, String passwordHash, String email, int id) {
         this.name = name;
         this.surname = surname;
         this.passwordHash = passwordHash;
         this.email = email;
+        this.id = id;
     }
 
     public String getName() {
@@ -43,5 +45,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

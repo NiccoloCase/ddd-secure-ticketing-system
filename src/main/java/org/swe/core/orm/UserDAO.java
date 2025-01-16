@@ -13,7 +13,7 @@ public class UserDAO {
           dbManager = DBManager.getInstance();
      }
 
-     public User getGuestById(int id) {
+     public User getUserById(int id) {
           try {
                Connection connection = dbManager.getConnection();
                PreparedStatement statement = connection.prepareStatement("SELECT * FROM guests WHERE id = ?");
@@ -28,7 +28,7 @@ public class UserDAO {
           return null;
      }
 
-     public ArrayList<User> getAllGuests() {
+     public ArrayList<User> getAllUsers() {
           ArrayList<User> guests = new ArrayList<>();
           try {
                Connection connection = dbManager.getConnection();
@@ -43,7 +43,7 @@ public class UserDAO {
           return guests;
      }
 
-     public User findGuestByEmail(String email) {
+     public User findUserByEmail(String email) {
           try {
                Connection connection = dbManager.getConnection();
                PreparedStatement statement = connection.prepareStatement("SELECT * FROM guests WHERE email = ?");
@@ -58,7 +58,7 @@ public class UserDAO {
           return null;
      }
 
-     public boolean addGuest(User guest) {
+     public boolean addUser(User guest) {
           try {
                Connection connection = dbManager.getConnection();
                PreparedStatement statement = connection.prepareStatement("INSERT INTO guests (name, email) VALUES (?, ?)");
@@ -72,7 +72,7 @@ public class UserDAO {
           return false;
      }
 
-     public boolean updateGuest(User guest) {
+     public boolean updateUser(User guest) {
           try {
                Connection connection = dbManager.getConnection();
                PreparedStatement statement = connection.prepareStatement("UPDATE guests SET name = ?, email = ? WHERE id = ?");
@@ -87,6 +87,17 @@ public class UserDAO {
           return false;
      }
 
-    
+     public boolean deleteUser(int id) {
+          try {
+               Connection connection = dbManager.getConnection();
+               PreparedStatement statement = connection.prepareStatement("DELETE FROM guests WHERE id = ?");
+               statement.setInt(1, id);
+               statement.executeUpdate();
+               return true;
+          } catch (SQLException e) {
+               e.printStackTrace();
+          }
+          return false;
+     }
      
 }

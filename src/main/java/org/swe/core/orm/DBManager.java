@@ -13,11 +13,13 @@ public class DBManager {
      private Connection connection = null;
 
      private DBManager() {
+          Config.init();
            try {
                 connection = DriverManager.getConnection(Config.DB_URL);
                System.out.println("Connection established");
            } catch (SQLException e) {
                 e.printStackTrace();
+                System.out.println("Connection failed");
            }
      }
 
@@ -30,9 +32,10 @@ public class DBManager {
 
      public static void close() {
            try {
-                if (iManager != null && !iManager.connection.isClosed()) {
+                if (iManager != null && iManager.connection != null && !iManager.connection.isClosed()) {
                      iManager.connection.close();
                      System.out.println("Connection closed");
+                     iManager = null;
                 }
            } catch (SQLException e) {
                 e.printStackTrace();

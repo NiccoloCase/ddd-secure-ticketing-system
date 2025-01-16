@@ -1,22 +1,25 @@
 package org.swe.business;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.swe.core.auth.AuthHandler;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class UserControllerTest {
 
-    private AuthHandler mockAuthHandler;
+    private AuthService mockAuthService;
     private UserController userController;
 
     @BeforeEach
     public void setUp() {
-        mockAuthHandler = Mockito.mock(AuthHandler.class);
-        userController = new UserController(mockAuthHandler);
+        mockAuthService = Mockito.mock(AuthService.class);
+        userController = new UserController(mockAuthService);
     }
 
     @Test
@@ -25,12 +28,12 @@ public class UserControllerTest {
         String password = "password";
         String expectedToken = "validToken";
 
-        when(mockAuthHandler.authenticate(email, password)).thenReturn(expectedToken);
+        when(mockAuthService.authenticate(email, password)).thenReturn(expectedToken);
 
         String actualToken = userController.login(email, password);
 
         assertEquals(expectedToken, actualToken, "The token should match the expected one");
-        verify(mockAuthHandler, times(1)).authenticate(email, password);
+        verify(mockAuthService, times(1)).authenticate(email, password);
 
     }
 
@@ -39,11 +42,11 @@ public class UserControllerTest {
         String email = "user@example.com";
         String password = "wrongPassword";
 
-        when(mockAuthHandler.authenticate(email, password)).thenReturn(null);
+        when(mockAuthService.authenticate(email, password)).thenReturn(null);
 
         assertThrows(IllegalArgumentException.class, () -> userController.login(email, password));
 
-        verify(mockAuthHandler, times(1)).authenticate(email, password);
+        verify(mockAuthService, times(1)).authenticate(email, password);
 
     }
 
@@ -51,25 +54,26 @@ public class UserControllerTest {
     public void testLogoutSuccess() {
         String token = "validToken";
 
-        when(mockAuthHandler.invalidateToken(token)).thenReturn(true);
+        when(mockAuthService.invalidateToken(token)).thenReturn(true);
 
         boolean result = userController.logout(token);
 
         assertTrue(result, "The token should be invalidated");
 
-        verify(mockAuthHandler, times(1)).invalidateToken(token);
+        verify(mockAuthService, times(1)).invalidateToken(token);
     }
 
     @Test
     public void testLogoutFailure() {
         String token = "invalidToken";
 
-        when(mockAuthHandler.invalidateToken(token)).thenReturn(false);
+        when(mockAuthService.invalidateToken(token)).thenReturn(false);
 
         boolean result = userController.logout(token);
 
         assertFalse(result, "The logout should fail");
 
-        verify(mockAuthHandler, times(1)).invalidateToken(token);
+        verify(mockAuthService, times(1)).invalidateToken(token);
     }
+
 }

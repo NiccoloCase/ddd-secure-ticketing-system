@@ -4,8 +4,8 @@ public class UserController {
 
     private final AuthService authService;
 
-    public UserController(AuthService authHandler) {
-        this.authService = authHandler;
+    public UserController(AuthService authService) {
+        this.authService = authService;
     }
 
     public String login(String email, String password) {

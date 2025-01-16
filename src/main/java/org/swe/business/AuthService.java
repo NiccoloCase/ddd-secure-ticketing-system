@@ -44,10 +44,4 @@ public class AuthService {
         return JWTUtility.validateToken(token);
     }
 
-    public void signupUser(String name, String email, String rawPassword) {
-        // - Validate
-        // - Hash password
-        // - DB
-    }
-
 }

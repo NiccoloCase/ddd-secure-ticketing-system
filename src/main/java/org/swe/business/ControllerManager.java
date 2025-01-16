@@ -2,7 +2,6 @@ package org.swe.business;
 
 public final class ControllerManager {
 
-    // FIXME: 1 solo authHandler per tutti i controller?
     private static final AuthService authService = new AuthService();
     private static GuestController guestController = null;
     private static StaffController staffController = null;

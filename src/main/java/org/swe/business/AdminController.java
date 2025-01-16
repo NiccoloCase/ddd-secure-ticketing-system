@@ -12,16 +12,15 @@ public class AdminController extends UserController {
         super(authHandler);
     }
 
-    public Event createEvent(int id, String title, String description, Date date, int ticketsAvailable,
-            double ticketPrice) {
+    public Event createEvent() {
 
         // TODO: Verifica token?
-        Event event = new Event(id, title, description, date, ticketsAvailable, ticketPrice);
+
 
         // TODO: Salvataggio nel database
         // DBManager.save(event);
 
-        return event;
+        return null;
     }
 
     public void deleteEvent(int eventId) {

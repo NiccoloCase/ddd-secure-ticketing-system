@@ -3,12 +3,11 @@ package org.swe.business;
 import java.util.Date;
 import java.util.List;
 
-import org.swe.core.auth.AuthHandler;
 import org.swe.model.Event;
 
 public class AdminController extends UserController {
 
-    public AdminController(AuthHandler authHandler) {
+    public AdminController(AuthService authHandler) {
         super(authHandler);
     }
 

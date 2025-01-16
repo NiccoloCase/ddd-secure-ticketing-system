@@ -1,12 +1,10 @@
 package org.swe.business;
 
-import org.swe.core.auth.AuthHandler;
-
 public class UserController {
 
-    private final AuthHandler authHandler;
+    private final AuthService authHandler;
 
-    public UserController(AuthHandler authHandler) {
+    public UserController(AuthService authHandler) {
         this.authHandler = authHandler;
     }
 

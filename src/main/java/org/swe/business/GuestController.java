@@ -1,11 +1,10 @@
 package org.swe.business;
 
-import org.swe.core.auth.AuthHandler;
 import org.swe.model.Ticket;
 
 public class GuestController extends UserController {
 
-    public GuestController(AuthHandler authHandler) {
+    public GuestController(AuthService authHandler) {
         super(authHandler);
     }
 

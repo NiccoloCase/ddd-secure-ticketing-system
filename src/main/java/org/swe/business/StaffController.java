@@ -1,10 +1,8 @@
 package org.swe.business;
 
-import org.swe.core.auth.AuthHandler;
-
 public class StaffController extends UserController {
 
-    public StaffController(AuthHandler authHandler) {
+    public StaffController(AuthService authHandler) {
         super(authHandler);
     }
 

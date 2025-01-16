@@ -4,7 +4,7 @@ public class Admin  extends User {
 
     private int eventId;
 
-    public Admin(String name, String surname, String passwordHash, String email, int eventId, int id) {
+    public Admin(String name, String surname, String passwordHash, String email, int id, int eventId) {
         super(name, surname, passwordHash, email, id);
         this.eventId = eventId;
     }

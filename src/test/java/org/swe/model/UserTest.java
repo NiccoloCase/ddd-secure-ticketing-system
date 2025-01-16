@@ -1,7 +1,7 @@
 package org.swe.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class UserTest {
 
@@ -23,10 +23,12 @@ public class UserTest {
         user.setSurname("Smith");
         user.setPasswordHash("newHashedPassword");
         user.setEmail("alice.smith@example.com");
+        user.setId(1);
 
         assertEquals("Alice", user.getName());
         assertEquals("Smith", user.getSurname());
         assertEquals("newHashedPassword", user.getPasswordHash());
         assertEquals("alice.smith@example.com", user.getEmail());
+        assertEquals(1, user.getId());
     }
 }

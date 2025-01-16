@@ -75,4 +75,5 @@ public class UserControllerTest {
 
         verify(mockAuthService, times(1)).invalidateToken(token);
     }
+
 }

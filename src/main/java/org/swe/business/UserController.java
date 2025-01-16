@@ -2,14 +2,14 @@ package org.swe.business;
 
 public class UserController {
 
-    private final AuthService authHandler;
+    private final AuthService authService;
 
     public UserController(AuthService authHandler) {
-        this.authHandler = authHandler;
+        this.authService = authHandler;
     }
 
     public String login(String email, String password) {
-        String token = authHandler.authenticate(email, password);
+        String token = authService.authenticate(email, password);
 
         if (token != null) {
             return token;
@@ -19,12 +19,16 @@ public class UserController {
     }
 
     public boolean logout(String token) {
-        return authHandler.invalidateToken(token);
+        return authService.invalidateToken(token);
     }
 
     public void signup() {
 
         // TODO cosa ritornerà? un token? quali sono i parametri?
 
+    }
+
+    public boolean validateToken(String token) {
+        return authService.validateToken(token) != null;
     }
 }

@@ -19,7 +19,7 @@ public class ConcreteTicketDAO implements TicketDAO {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                return new Ticket(resultSet.getInt("id"), resultSet.getInt("userId"), resultSet.getInt("quantity"), resultSet.getInt("code"), resultSet.getBoolean("used"));
+                return new Ticket(resultSet.getInt("id"), resultSet.getInt("userId"), resultSet.getInt("quantity"), resultSet.getBoolean("used"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -34,7 +34,7 @@ public class ConcreteTicketDAO implements TicketDAO {
                Statement statement = connection.createStatement();
                ResultSet resultSet = statement.executeQuery("SELECT * FROM Ticket");
                while (resultSet.next()) {
-                    tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getInt("userId"), resultSet.getInt("quantity"), resultSet.getInt("code"), resultSet.getBoolean("used")));
+                    tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getInt("userId"), resultSet.getInt("quantity"), resultSet.getBoolean("used")));
                }
                return tickets;
           } catch (SQLException e) {
@@ -50,7 +50,7 @@ public class ConcreteTicketDAO implements TicketDAO {
                statement.setInt(1, code);
                ResultSet resultSet = statement.executeQuery();
                if (resultSet.next()) {
-                    return new Ticket(resultSet.getInt("id"), resultSet.getInt("userId"), resultSet.getInt("quantity"), resultSet.getInt("code"), resultSet.getBoolean("used"));
+                    return new Ticket(resultSet.getInt("id"), resultSet.getInt("userId"), resultSet.getInt("quantity"), resultSet.getBoolean("used"));
                }
           } catch (SQLException e) {
                e.printStackTrace();
@@ -61,12 +61,11 @@ public class ConcreteTicketDAO implements TicketDAO {
      public boolean addTicket(Ticket ticket) {
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("INSERT INTO Ticket (id, userId, quantity, code, used) VALUES (?, ?, ?, ?, ?)");
+               PreparedStatement statement = connection.prepareStatement("INSERT INTO Ticket (id, userId, quantity, used) VALUES (?, ?, ?, ?)");
                statement.setInt(1, ticket.getId());
                statement.setInt(2, ticket.getUserId());
                statement.setInt(3, ticket.getQuantity());
-               statement.setInt(4, ticket.getCode());
-               statement.setBoolean(5, ticket.isUsed());
+               statement.setBoolean(4, ticket.isUsed());
                statement.executeUpdate();
                return true;
           } catch (SQLException e) {

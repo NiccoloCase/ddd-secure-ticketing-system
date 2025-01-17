@@ -8,6 +8,7 @@ import org.swe.core.DAO.UserDAO;
 public final class ApplicationManager {
 
     private final AuthService authService;
+    private final VerifySessionService verifySessionService;
     private final EventDAO eventDAO = new ConcreteEventDAO();
     private final UserDAO userDAO = new ConcreteUserDAO();
     private GuestController guestController = null;
@@ -16,6 +17,7 @@ public final class ApplicationManager {
 
     public ApplicationManager() {
         authService = new AuthServiceImpl();
+        verifySessionService = new VerifySessionServiceImpl();
     }
 
     public GuestController getGuestController() {
@@ -27,7 +29,7 @@ public final class ApplicationManager {
 
     public StaffController getStaffController() {
         if (staffController == null) {
-            staffController = new StaffController(authService);
+            staffController = new StaffController(authService, verifySessionService);
         }
         return staffController;
     }

@@ -1,13 +1,12 @@
-package org.swe.core.dto;
+package org.swe.core.DTO;
 
-import jakarta.validation.constraints.*;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
 import java.util.Date;
 
-public class UpdateEventDTO {
-
-    @NotNull(message = "Event ID cannot be null.")
-    private Integer eventId;
+public class CreateEventDTO {
 
     @NotBlank(message = "Title cannot be empty.")
     private String title;
@@ -24,21 +23,12 @@ public class UpdateEventDTO {
     @Positive(message = "Ticket price must be greater than 0.")
     private double ticketPrice;
 
-    public UpdateEventDTO(Integer eventId, String title, String description, Date date, int ticketsAvailable, double ticketPrice) {
-        this.eventId = eventId;
+    public CreateEventDTO(String title, String description, Date date, int ticketsAvailable, double ticketPrice) {
         this.title = title;
         this.description = description;
         this.date = date;
         this.ticketsAvailable = ticketsAvailable;
         this.ticketPrice = ticketPrice;
-    }
-
-    public Integer getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Integer eventId) {
-        this.eventId = eventId;
     }
 
     public String getTitle() {

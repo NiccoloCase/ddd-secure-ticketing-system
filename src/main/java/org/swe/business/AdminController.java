@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.swe.core.DAO.EventDAO;
 import org.swe.core.DAO.UserDAO;
-import org.swe.core.dto.AddStaffToEventDTO;
-import org.swe.core.dto.CreateEventDTO;
-import org.swe.core.dto.RemoveStaffFromEventDTO;
-import org.swe.core.dto.UpdateEventDTO;
+import org.swe.core.DTO.AddStaffToEventDTO;
+import org.swe.core.DTO.CreateEventDTO;
+import org.swe.core.DTO.RemoveStaffFromEventDTO;
+import org.swe.core.DTO.UpdateEventDTO;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.model.Admin;

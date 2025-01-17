@@ -1,12 +1,12 @@
-package org.swe.core.dto;
+package org.swe.core.DTO;
 
 import jakarta.validation.constraints.NotNull;
 
-public class StartValidationSessionDTO {
+public class StartVerificationSessionDTO {
     @NotNull(message = "Event ID cannot be null.")
     private Integer eventId;
 
-    public StartValidationSessionDTO(Integer eventId) {
+    public StartVerificationSessionDTO(Integer eventId) {
         this.eventId = eventId;
     }
 

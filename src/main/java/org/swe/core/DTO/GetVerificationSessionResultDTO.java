@@ -1,8 +1,8 @@
-package org.swe.core.dto;
+package org.swe.core.DTO;
 
 import jakarta.validation.constraints.NotNull;
 
-public class GetValidationSessionResultDTO {
+public class GetVerificationSessionResultDTO {
 
     @NotNull
     private Integer sessionId;

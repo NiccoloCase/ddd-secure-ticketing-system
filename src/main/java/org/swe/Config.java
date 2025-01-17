@@ -10,7 +10,6 @@ public class Config {
         Dotenv dotenv = Dotenv.load();
         JWT_SECRET = dotenv.get("JWT_SECRET");
         DB_URL = dotenv.get("DB_URL");
-        System.out.println("DB url prelevato" + DB_URL );
     }
 
 }

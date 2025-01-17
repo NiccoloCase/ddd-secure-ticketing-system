@@ -4,7 +4,7 @@ import org.swe.model.VerifySession;
 
 public interface VerifySessionService {
 
-    void addToSession(String key, VerifySession value);
+    String addToSession(VerifySession value);
 
     VerifySession getFromSession(String key);
 

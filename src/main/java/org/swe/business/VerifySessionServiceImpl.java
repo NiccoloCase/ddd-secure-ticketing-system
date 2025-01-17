@@ -6,13 +6,16 @@ import org.swe.model.VerifySessionStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-public class VerifySessionServiceImpl implements VerifySessionService{
+public class VerifySessionServiceImpl implements VerifySessionService {
     private final Map<String, VerifySession> sessionData = new HashMap<>();
 
 
-    public void addToSession(String key, VerifySession value) {
+    public String addToSession(VerifySession value) {
+        String key = generateNewSessionKey();
         sessionData.put(key, value);
+        return key;
     }
 
     public VerifySession getFromSession(String key) {
@@ -55,5 +58,13 @@ public class VerifySessionServiceImpl implements VerifySessionService{
         }
         session.setTicketId(ticketId);
         session.setStatus(VerifySessionStatus.INVALID);
+    }
+
+    private String generateNewSessionKey(){
+        String key = null;
+        while (key == null || sessionData.containsKey(key)) {
+            key = UUID.randomUUID().toString();
+        }
+        return key;
     }
 }

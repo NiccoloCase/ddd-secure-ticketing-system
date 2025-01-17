@@ -18,10 +18,6 @@ public class UserController {
         }
     }
 
-    public boolean logout(String token) {
-        return authService.invalidateToken(token);
-    }
-
     public void signup() {
 
         // TODO cosa ritornerà? un token? quali sono i parametri?

@@ -13,7 +13,7 @@ public class Main {
 
         // DAO test
         System.out.println("DAO test");
-        //TicketDAO ticketDAO = new ConcreteTicketDAO();
+        TicketDAO ticketDAO = new ConcreteTicketDAO();
         //UserDAO userDAO = new ConcreteUserDAO();
         EventDAO eventDAO = new ConcreteEventDAO();
 

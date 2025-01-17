@@ -1,6 +1,10 @@
 package org.swe.core.DAO;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.swe.core.dbManager.DBManager;
@@ -45,7 +49,7 @@ public class ConcreteUserDAO implements UserDAO {
           return guests;
      }
 
-     /*public User findUserByEmail(String email) {
+     public User findUserByEmail(String email) {
           try {
                Connection connection = dbManager.getConnection();
                PreparedStatement statement = connection.prepareStatement("SELECT * FROM guests WHERE email = ?");
@@ -58,7 +62,7 @@ public class ConcreteUserDAO implements UserDAO {
                e.printStackTrace();
           }
           return null;
-     }*/
+     }
 
      public boolean addUser(User guest) {
           try {

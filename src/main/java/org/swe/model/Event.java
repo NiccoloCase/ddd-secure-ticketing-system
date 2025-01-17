@@ -1,6 +1,8 @@
 package org.swe.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class Event {
@@ -10,6 +12,8 @@ public class Event {
     private final Date date;
     private final int ticketsAvailable;
     private final double ticketPrice;
+    private final List<Staff> staff;   
+    private final List<Admin> admins;  
 
     private Event(Builder builder) {
         this.id = builder.id;
@@ -18,6 +22,8 @@ public class Event {
         this.date = builder.date;
         this.ticketsAvailable = builder.ticketsAvailable;
         this.ticketPrice = builder.ticketPrice;
+        this.staff = builder.staff;
+        this.admins = builder.admins;
     }
 
     public int getId() {
@@ -44,6 +50,15 @@ public class Event {
         return ticketPrice;
     }
 
+    // Getter per le liste
+    public List<Staff> getStaff() {
+        return staff;
+    }
+
+    public List<Admin> getAdmins() {
+        return admins;
+    }
+
     @Override
     public String toString() {
         return "Event{" +
@@ -53,6 +68,8 @@ public class Event {
                 ", date=" + date +
                 ", ticketsAvailable=" + ticketsAvailable +
                 ", ticketPrice=" + ticketPrice +
+                ", staff=" + staff +
+                ", admins=" + admins +
                 '}';
     }
 
@@ -63,6 +80,8 @@ public class Event {
         private Date date;
         private int ticketsAvailable;
         private double ticketPrice;
+        private List<Staff> staff = new ArrayList<>();
+        private List<Admin> admins = new ArrayList<>();
 
         public Builder setId(int id) {
             if (id <= 0) {
@@ -109,6 +128,22 @@ public class Event {
                 throw new IllegalArgumentException("Ticket price must be 0 or greater.");
             }
             this.ticketPrice = ticketPrice;
+            return this;
+        }
+
+        public Builder setStaff(List<Staff> staff) {
+            if (staff == null) {
+                throw new IllegalArgumentException("Staff list cannot be null.");
+            }
+            this.staff = staff;
+            return this;
+        }
+
+        public Builder setAdmins(List<Admin> admins) {
+            if (admins == null) {
+                throw new IllegalArgumentException("Admin list cannot be null.");
+            }
+            this.admins = admins;
             return this;
         }
 

@@ -1,8 +1,15 @@
 package org.swe.business;
 
+import org.swe.core.DAO.ConcreteEventDAO;
+import org.swe.core.DAO.ConcreteUserDAO;
+import org.swe.core.DAO.EventDAO;
+import org.swe.core.DAO.UserDAO;
+
 public final class ApplicationManager {
 
     private final AuthService authService;
+    private final EventDAO eventDAO = new ConcreteEventDAO();
+    private final UserDAO userDAO = new ConcreteUserDAO();
     private GuestController guestController = null;
     private StaffController staffController = null;
     private AdminController adminController = null;
@@ -27,7 +34,7 @@ public final class ApplicationManager {
 
     public AdminController getAdminController() {
         if (adminController == null) {
-            adminController = new AdminController(authService);
+            adminController = new AdminController(authService, eventDAO, userDAO);
         }
         return adminController;
     }

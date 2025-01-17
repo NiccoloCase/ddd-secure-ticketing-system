@@ -1,9 +1,14 @@
 package org.swe.core.DAO;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
 import org.swe.core.dbManager.DBManager;
 import org.swe.model.Event;
-import java.sql.*;
-import java.util.ArrayList;
 
 public class ConcreteEventDAO implements EventDAO {
      private DBManager dbManager;
@@ -12,6 +17,7 @@ public class ConcreteEventDAO implements EventDAO {
           dbManager = DBManager.getInstance();
      }
 
+     @Override
      public Event getEvent(int id) {
           Event event = null;
           try {
@@ -39,6 +45,7 @@ public class ConcreteEventDAO implements EventDAO {
           return event;
      }
 
+     @Override
      public ArrayList<Event> getAllEvents() {
           ArrayList<Event> events = new ArrayList<>();
           try {
@@ -65,6 +72,7 @@ public class ConcreteEventDAO implements EventDAO {
           return events;
      }
 
+     @Override
      public boolean addEvent(Event event) {
           try {
                Connection connection = dbManager.getConnection();
@@ -86,6 +94,7 @@ public class ConcreteEventDAO implements EventDAO {
           }
      }
 
+     @Override
      public boolean updateEvent(Event event) {
           try {
                Connection connection = dbManager.getConnection();
@@ -107,6 +116,7 @@ public class ConcreteEventDAO implements EventDAO {
           }
      }
 
+     @Override
      public boolean deleteEvent(int id) {
           try {
                Connection connection = dbManager.getConnection();

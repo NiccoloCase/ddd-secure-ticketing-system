@@ -1,39 +1,45 @@
 package org.swe.business;
 
-import org.swe.core.exceptions.InternalServerErrorException;
-import org.swe.model.VerifySession;
-import org.swe.model.VerifySessionStatus;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import org.swe.core.exceptions.InternalServerErrorException;
+import org.swe.model.VerifySession;
+import org.swe.model.VerifySessionStatus;
 
 public class VerifySessionServiceImpl implements VerifySessionService {
     private final Map<String, VerifySession> sessionData = new HashMap<>();
 
 
+    @Override
     public String addToSession(VerifySession value) {
         String key = generateNewSessionKey();
         sessionData.put(key, value);
         return key;
     }
 
+    @Override
     public VerifySession getFromSession(String key) {
         return sessionData.get(key);
     }
 
+    @Override
     public void removeFromSession(String key) {
         sessionData.remove(key);
     }
 
+    @Override
     public boolean isInSession(String key) {
         return sessionData.containsKey(key);
     }
 
+    @Override
     public void clearSession() {
         sessionData.clear();
     }
 
+    @Override
     public void verifySession(String key, Integer ticketId) {
         VerifySession session = sessionData.get(key);
         if (session == null) {
@@ -43,6 +49,7 @@ public class VerifySessionServiceImpl implements VerifySessionService {
         session.setStatus(VerifySessionStatus.VERIFIED);
     }
 
+    @Override
     public void rejectSession(String key) {
         VerifySession session = sessionData.get(key);
         if (session == null) {
@@ -51,6 +58,7 @@ public class VerifySessionServiceImpl implements VerifySessionService {
         session.setStatus(VerifySessionStatus.INVALID);
     }
 
+    @Override
     public void rejectSession(String key, Integer ticketId) {
         VerifySession session = sessionData.get(key);
         if (session == null) {

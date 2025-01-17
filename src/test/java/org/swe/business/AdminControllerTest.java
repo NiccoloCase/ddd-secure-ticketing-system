@@ -18,8 +18,6 @@ public class AdminControllerTest {
         mockUserDAO = mock(UserDAO.class);
         mockAuthService = mock(AuthService.class);
 
-        adminController = new AdminController(mockAuthService);
-        adminController.setEventDAO(mockEventDAO);
-        adminController.setUserDAO(mockUserDAO);
+        adminController = new AdminController(mockAuthService, mockEventDAO, mockUserDAO);
     }
 }

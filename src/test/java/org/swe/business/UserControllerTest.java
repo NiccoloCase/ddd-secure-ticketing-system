@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.swe.core.DTO.LoginDTO;
 
 public class UserControllerTest {
 
@@ -26,9 +27,11 @@ public class UserControllerTest {
         String password = "password";
         String expectedToken = "validToken";
 
+        LoginDTO dto = new LoginDTO(email, password);
+
         when(mockAuthService.authenticate(email, password)).thenReturn(expectedToken);
 
-        String actualToken = userController.login(email, password);
+        String actualToken = userController.login(dto);
 
         assertEquals(expectedToken, actualToken, "The token should match the expected one");
         verify(mockAuthService, times(1)).authenticate(email, password);
@@ -40,9 +43,11 @@ public class UserControllerTest {
         String email = "user@example.com";
         String password = "wrongPassword";
 
+        LoginDTO dto = new LoginDTO(email, password);
+
         when(mockAuthService.authenticate(email, password)).thenReturn(null);
 
-        assertThrows(IllegalArgumentException.class, () -> userController.login(email, password));
+        assertThrows(IllegalArgumentException.class, () -> userController.login(dto));
 
         verify(mockAuthService, times(1)).authenticate(email, password);
 

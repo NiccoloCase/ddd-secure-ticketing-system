@@ -2,6 +2,7 @@ package org.swe.business;
 
 import org.swe.core.DAO.ConcreteUserDAO;
 import org.swe.core.DAO.UserDAO;
+import org.swe.core.DTO.LoginDTO;
 import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.utils.JWTUtility;
@@ -18,8 +19,8 @@ public class UserController {
         this.authService = authService;
     }
 
-    public String login(String email, String password) {
-        String token = authService.authenticate(email, password);
+    public String login(LoginDTO dto) {
+        String token = authService.authenticate(dto.email, dto.password);
 
         if (token != null) {
             return token;

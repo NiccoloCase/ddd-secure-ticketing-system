@@ -1,9 +1,14 @@
 package org.swe.core.DAO;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+
 import org.swe.core.dbManager.DBManager;
 import org.swe.model.Ticket;
-import java.util.ArrayList;
-import java.sql.*;
 
 public class ConcreteTicketDAO implements TicketDAO {
     private DBManager dbManager;
@@ -12,6 +17,7 @@ public class ConcreteTicketDAO implements TicketDAO {
         dbManager = DBManager.getInstance();
      }
 
+    @Override
     public Ticket getTicketById(int id) {
         try {
             Connection connection = dbManager.getConnection();
@@ -27,6 +33,7 @@ public class ConcreteTicketDAO implements TicketDAO {
             return null;
      }
 
+    @Override
      public ArrayList<Ticket> getAllTickets() {
           ArrayList<Ticket> tickets = new ArrayList<>();
           try {
@@ -43,6 +50,7 @@ public class ConcreteTicketDAO implements TicketDAO {
           return null;
      }
 
+    @Override
      public Ticket findTicketByCode(int code) {
           try {
                Connection connection = dbManager.getConnection();
@@ -58,6 +66,7 @@ public class ConcreteTicketDAO implements TicketDAO {
           return null;
      }
 
+    @Override
      public boolean addTicket(Ticket ticket) {
           try {
                Connection connection = dbManager.getConnection();
@@ -74,6 +83,7 @@ public class ConcreteTicketDAO implements TicketDAO {
           return false;
      }
 
+    @Override
      public boolean updateTicket(Ticket ticket) {
           try {
                   Connection connection = dbManager.getConnection();
@@ -89,6 +99,7 @@ public class ConcreteTicketDAO implements TicketDAO {
           return false;
      }
 
+    @Override
      public boolean deleteTicket(int id) {
           try {
                Connection connection = dbManager.getConnection();

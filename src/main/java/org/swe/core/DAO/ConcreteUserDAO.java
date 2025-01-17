@@ -34,6 +34,7 @@ public class ConcreteUserDAO implements UserDAO {
           return null;
      }
 
+     @Override
      public ArrayList<User> getAllUsers() {
           ArrayList<User> guests = new ArrayList<>();
           try {
@@ -49,6 +50,7 @@ public class ConcreteUserDAO implements UserDAO {
           return guests;
      }
 
+     @Override
      public User findUserByEmail(String email) {
           try {
                Connection connection = dbManager.getConnection();
@@ -64,6 +66,7 @@ public class ConcreteUserDAO implements UserDAO {
           return null;
      }
 
+     @Override
      public boolean addUser(User guest) {
           try {
                Connection connection = dbManager.getConnection();
@@ -78,6 +81,7 @@ public class ConcreteUserDAO implements UserDAO {
           return false;
      }
 
+     @Override
      public boolean updateUser(User guest) {
           try {
                Connection connection = dbManager.getConnection();
@@ -93,6 +97,7 @@ public class ConcreteUserDAO implements UserDAO {
           return false;
      }
 
+     @Override
      public boolean deleteUser(int id) {
           try {
                Connection connection = dbManager.getConnection();

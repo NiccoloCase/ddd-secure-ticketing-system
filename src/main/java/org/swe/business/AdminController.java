@@ -19,8 +19,10 @@ public class AdminController extends UserController {
     private EventDAO eventDAO;
     private UserDAO userDAO;
 
-    public AdminController(AuthService authService) {
+    public AdminController(AuthService authService, EventDAO eventDAO, UserDAO userDAO) {
         super(authService);
+        this.eventDAO = eventDAO;
+        this.userDAO = userDAO;
     }
 
     public boolean createEvent(CreateEventDTO dto, String token) {

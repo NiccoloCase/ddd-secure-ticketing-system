@@ -1,5 +1,6 @@
-package org.swe.core.orm;
+package org.swe.core.DAO;
 
+import org.swe.core.dbManager.DBManager;
 import org.swe.model.Event;
 import java.sql.*;
 import java.util.ArrayList;

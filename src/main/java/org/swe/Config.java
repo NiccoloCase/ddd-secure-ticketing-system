@@ -11,5 +11,5 @@ public class Config {
         JWT_SECRET = dotenv.get("JWT_SECRET");
         DB_URL = dotenv.get("DB_URL");
     }
-
+    
 }

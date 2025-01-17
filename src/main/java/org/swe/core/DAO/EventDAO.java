@@ -1,4 +1,4 @@
-package org.swe.core.orm;
+package org.swe.core.DAO;
 
 import org.swe.model.Event;
 import java.util.ArrayList;

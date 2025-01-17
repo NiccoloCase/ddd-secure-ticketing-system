@@ -1,7 +1,9 @@
-package org.swe.core.orm;
+package org.swe.core.DAO;
 
 import java.sql.*;
 import java.util.ArrayList;
+
+import org.swe.core.dbManager.DBManager;
 import org.swe.model.User;
 
 //i campi sono degli esempi andranno quasi certamente modificati con quelli reali 

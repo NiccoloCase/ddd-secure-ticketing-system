@@ -1,7 +1,7 @@
 package org.swe;
 
 import org.swe.core.Config;
-import org.swe.core.orm.DBManager;
+import org.swe.core.dbManager.DBManager;
 
 public class Main {
     public static void main(String[] args) {

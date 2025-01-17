@@ -1,4 +1,4 @@
-package org.swe.core.orm;
+package org.swe.core.dbManager;
 
 import org.swe.Config;
 
@@ -23,12 +23,20 @@ public class DBManager {
            }
      }
 
-     public static DBManager getInstance() {
+     public static DBManager init() {
            if (iManager == null) {
                 iManager = new DBManager();
            }
            return iManager;
      }
+
+     public static DBManager getInstance() {
+           return init();
+     }
+
+     public Connection getConnection() {
+          return connection;
+    }
 
      public static void close() {
            try {
@@ -40,9 +48,5 @@ public class DBManager {
            } catch (SQLException e) {
                 e.printStackTrace();
            }
-     }
-
-     public Connection getConnection() {
-           return connection;
      }
 }

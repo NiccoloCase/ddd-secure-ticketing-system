@@ -15,7 +15,7 @@ public class ConcreteTicketDAO implements TicketDAO {
     public Ticket getTicketById(int id) {
         try {
             Connection connection = dbManager.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM tickets WHERE id = ?");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM Ticket WHERE id = ?");
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -32,7 +32,7 @@ public class ConcreteTicketDAO implements TicketDAO {
           try {
                Connection connection = dbManager.getConnection();
                Statement statement = connection.createStatement();
-               ResultSet resultSet = statement.executeQuery("SELECT * FROM tickets");
+               ResultSet resultSet = statement.executeQuery("SELECT * FROM Ticket");
                while (resultSet.next()) {
                     tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getInt("userId"), resultSet.getInt("quantity"), resultSet.getInt("code"), resultSet.getBoolean("used")));
                }
@@ -46,7 +46,7 @@ public class ConcreteTicketDAO implements TicketDAO {
      public Ticket findTicketByCode(int code) {
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("SELECT * FROM tickets WHERE code = ?");
+               PreparedStatement statement = connection.prepareStatement("SELECT * FROM Ticket WHERE code = ?");
                statement.setInt(1, code);
                ResultSet resultSet = statement.executeQuery();
                if (resultSet.next()) {
@@ -61,7 +61,7 @@ public class ConcreteTicketDAO implements TicketDAO {
      public boolean addTicket(Ticket ticket) {
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("INSERT INTO tickets (id, userId, quantity, code, used) VALUES (?, ?, ?, ?, ?)");
+               PreparedStatement statement = connection.prepareStatement("INSERT INTO Ticket (id, userId, quantity, code, used) VALUES (?, ?, ?, ?, ?)");
                statement.setInt(1, ticket.getId());
                statement.setInt(2, ticket.getUserId());
                statement.setInt(3, ticket.getQuantity());
@@ -78,7 +78,7 @@ public class ConcreteTicketDAO implements TicketDAO {
      public boolean updateTicket(Ticket ticket) {
           try {
                   Connection connection = dbManager.getConnection();
-                  PreparedStatement statement = connection.prepareStatement("UPDATE tickets SET userId = ?, used = ? WHERE id = ?");
+                  PreparedStatement statement = connection.prepareStatement("UPDATE Ticket SET userId = ?, used = ? WHERE id = ?");
                   statement.setInt(1, ticket.getUserId());
                   statement.setBoolean(2, ticket.isUsed());
                   statement.setInt(3, ticket.getId());
@@ -93,7 +93,7 @@ public class ConcreteTicketDAO implements TicketDAO {
      public boolean deleteTicket(int id) {
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("DELETE FROM tickets WHERE id = ?");
+               PreparedStatement statement = connection.prepareStatement("DELETE FROM Ticket WHERE id = ?");
                statement.setInt(1, id);
                statement.executeUpdate();
                return true;

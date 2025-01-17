@@ -2,6 +2,8 @@ package org.swe.business;
 
 import org.swe.core.DAO.ConcreteUserDAO;
 import org.swe.core.DAO.UserDAO;
+import org.swe.core.exceptions.BadRequestException;
+import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.utils.JWTUtility;
 import org.swe.model.User;
 
@@ -22,7 +24,7 @@ public class UserController {
         if (token != null) {
             return token;
         } else {
-            throw new IllegalArgumentException("Invalid email or password");
+            throw new NotFoundException("Invalid email or password");
         }
     }
 
@@ -39,15 +41,15 @@ public class UserController {
     protected User validateInterceptor(String token) {
         Claims claims = JWTUtility.validateToken(token);
         if (claims == null) {
-            throw new IllegalArgumentException("Invalid or expired token.");
+            throw new BadRequestException("Token is invalid or expired");
         }
         Integer userId = claims.get("userId", Integer.class);
         if (userId == null) {
-            throw new IllegalArgumentException("No userId found in token.");
+            throw new BadRequestException("userId is invalid.");
         }
         User user = userDAO.getUser(userId);
         if (user == null) {
-            throw new IllegalArgumentException("User not found.");
+            throw new NotFoundException("User not found.");
         }
         return user;
     }

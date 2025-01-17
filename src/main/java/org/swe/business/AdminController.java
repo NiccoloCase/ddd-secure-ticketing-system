@@ -8,6 +8,8 @@ import org.swe.core.dto.AddStaffToEventDTO;
 import org.swe.core.dto.CreateEventDTO;
 import org.swe.core.dto.RemoveStaffFromEventDTO;
 import org.swe.core.dto.UpdateEventDTO;
+import org.swe.core.exceptions.NotFoundException;
+import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.model.Admin;
 import org.swe.model.Event;
 import org.swe.model.User;
@@ -27,7 +29,7 @@ public class AdminController extends UserController {
 
         // TODO: Forse levare? guest e staff possono creare eventi?
         if (!(user instanceof Admin)) {
-            throw new IllegalArgumentException("User is not an admin");
+            throw new UnauthorizedException("Not authorized. Must be admin.");
         }
 
         Event event = new Event.Builder()
@@ -44,8 +46,7 @@ public class AdminController extends UserController {
     public boolean deleteEvent(int eventId, String token) {
         User user = validateInterceptor(token);
         if (!(user instanceof Admin)) {
-            System.out.println("Not authorized. Must be admin.");
-            return false;
+            throw new UnauthorizedException("Not authorized. Must be admin.");
         }
         return eventDAO.deleteEvent(eventId);
     }
@@ -53,8 +54,7 @@ public class AdminController extends UserController {
     public boolean updateEvent(UpdateEventDTO dto, String token) {
         User user = validateInterceptor(token);
         if (!(user instanceof Admin)) {
-            System.out.println("Not authorized. Must be admin.");
-            return false;
+            throw new UnauthorizedException("Not authorized. Must be admin.");
         }
 
         Event event = new Event.Builder()
@@ -73,7 +73,7 @@ public class AdminController extends UserController {
         User user = validateInterceptor(token);
 
         if (!(user instanceof Admin)) {
-            throw new IllegalArgumentException("User is not an admin");
+            throw new UnauthorizedException("Not authorized. Must be admin.");
         }
 
         // TODO: Cerca tutti gli eventi di qui l'utente è admin e ritorna la lista
@@ -86,7 +86,7 @@ public class AdminController extends UserController {
         User user = validateInterceptor(token);
 
         if (!(user instanceof Admin)) {
-            throw new IllegalArgumentException("User is not an admin");
+            throw new UnauthorizedException("Not authorized. Must be admin.");
         }
 
         // cerco l'user dato l'email nel dto e creo lo staff.
@@ -94,7 +94,7 @@ public class AdminController extends UserController {
         User dbUser = userDAO.findUserByEmail(dto.getStaffEmail());
 
         if (dbUser == null) {
-            throw new IllegalArgumentException("User not found");
+            throw new NotFoundException("User not found.");
         }
 
         // TODO: aggiungere lo staff all'evento dato l'id dell'evento
@@ -105,13 +105,14 @@ public class AdminController extends UserController {
         User user = validateInterceptor(token);
 
         if (!(user instanceof Admin)) {
-            throw new IllegalArgumentException("User is not an admin");
+            throw new UnauthorizedException("Not authorized. Must be admin.");
         }
 
         User dbUser = userDAO.findUserByEmail(dto.getStaffEmail());
 
         if (dbUser == null) {
-            throw new IllegalArgumentException("User not found");
+            throw new NotFoundException("User not found.");
+
         }
     }
 

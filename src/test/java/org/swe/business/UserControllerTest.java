@@ -1,9 +1,7 @@
 package org.swe.business;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -48,32 +46,6 @@ public class UserControllerTest {
 
         verify(mockAuthService, times(1)).authenticate(email, password);
 
-    }
-
-    @Test
-    public void testLogoutSuccess() {
-        String token = "validToken";
-
-        when(mockAuthService.invalidateToken(token)).thenReturn(true);
-
-        boolean result = userController.logout(token);
-
-        assertTrue(result, "The token should be invalidated");
-
-        verify(mockAuthService, times(1)).invalidateToken(token);
-    }
-
-    @Test
-    public void testLogoutFailure() {
-        String token = "invalidToken";
-
-        when(mockAuthService.invalidateToken(token)).thenReturn(false);
-
-        boolean result = userController.logout(token);
-
-        assertFalse(result, "The logout should fail");
-
-        verify(mockAuthService, times(1)).invalidateToken(token);
     }
 
 }

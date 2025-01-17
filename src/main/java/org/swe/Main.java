@@ -2,6 +2,7 @@ package org.swe;
 
 import org.swe.core.Config;
 import org.swe.core.DAO.*;
+import org.swe.core.dbManager.DBManager;
 import org.swe.model.*;
 
 
@@ -10,6 +11,8 @@ public class Main {
     public static void main(String[] args) {
         // Load the configurations
         Config.init();
+
+        DBManager dbManager = DBManager.getInstance();
 
         // DAO test
         System.out.println("DAO test");
@@ -21,7 +24,11 @@ public class Main {
         // then delete everithing
         /*System.out.println("TicketDAO test");
         for (int i = 0; i < 3; i++) {
-            Ticket ticket = new Ticket(i, i, i, i, false);
+            ticketDAO.deleteTicket(i+1);
+        }
+
+        for (int i = 0; i < 3; i++) {
+            Ticket ticket = new Ticket(i+1, i+1, i+1, false);
             ticketDAO.addTicket(ticket);
         }
         System.out.println(ticketDAO.getTicketById(1));
@@ -31,10 +38,11 @@ public class Main {
         ticketDAO.updateTicket(ticket);
         System.out.println(ticketDAO.getAllTickets());
         for (int i = 0; i < 3; i++) {
-            ticketDAO.deleteTicket(i);
+            ticketDAO.deleteTicket(i+1);
         }*/
 
         System.out.println("EventDAO test");
+
         for (int i = 0; i < 3; i++) {
             Event event = new Event.Builder()
                 .setId(i+1)
@@ -66,5 +74,7 @@ public class Main {
         for (int i = 0; i < 3; i++) {
             eventDAO.deleteEvent(i+1);
         }
+
+        DBManager.close();
     }
 }

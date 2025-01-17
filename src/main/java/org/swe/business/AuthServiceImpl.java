@@ -3,6 +3,9 @@ package org.swe.business;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.swe.core.DAO.ConcreteUserDAO;
+import org.swe.core.DAO.UserDAO;
+import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.utils.JWTUtility;
 import org.swe.core.utils.PasswordUtility;
 import org.swe.model.User;
@@ -11,19 +14,26 @@ import io.jsonwebtoken.Claims;
 
 public class AuthServiceImpl implements AuthService {
 
+    private final UserDAO userDAO = new ConcreteUserDAO();
+
     public AuthServiceImpl() {
     }
 
     @Override
     public String authenticate(String email, String password) {
-        // User user = dao.findUserByEmail(email);
-        User user = null; // Simula il DAO per ora
+        
+        User user = userDAO.findUserByEmail(email);
         if (user == null) {
-            return null;
+            throw new NotFoundException("User not found.");
         }
 
+        String passwordHash = user.getPasswordHash();
+
+        if (!PasswordUtility.checkPassword(password, passwordHash)) {
+            throw new NotFoundException("PasswordHash not found in database.");
+        }
         if (!PasswordUtility.checkPassword(password, user.getPasswordHash())) {
-            return null;
+            throw new NotFoundException("Invalid password.");
         }
 
         Map<String, Object> claims = new HashMap<>();
@@ -34,9 +44,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public Claims validateToken(String token) {
-        // if (blacklistedTokens.contains(token)) {
-        // return null;
-        // }
         return JWTUtility.validateToken(token);
     }
+    
 }

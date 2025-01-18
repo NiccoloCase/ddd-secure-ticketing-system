@@ -25,7 +25,9 @@ public class ConcreteTicketDAO implements TicketDAO {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                return new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"),  resultSet.getInt("event_id"), resultSet.getInt("quantity"), resultSet.getBoolean("used"));
+               Ticket ticket = new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("event_id"), resultSet.getInt("quantity"), resultSet.getBoolean("used"));
+               statement.close();
+                return ticket;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -43,23 +45,8 @@ public class ConcreteTicketDAO implements TicketDAO {
                while (resultSet.next()) {
                     tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("event_id"), resultSet.getInt("quantity"), resultSet.getBoolean("used")));
                }
+               statement.close();
                return tickets;
-          } catch (SQLException e) {
-               e.printStackTrace();
-          }
-          return null;
-     }
-
-    @Override
-     public Ticket findTicketByCode(int code) {
-          try {
-               Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("SELECT * FROM Ticket WHERE code = ?");
-               statement.setInt(1, code);
-               ResultSet resultSet = statement.executeQuery();
-               if (resultSet.next()) {
-                    return new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("event_id "), resultSet.getInt("quantity"), resultSet.getBoolean("used"));
-               }
           } catch (SQLException e) {
                e.printStackTrace();
           }
@@ -79,7 +66,9 @@ public class ConcreteTicketDAO implements TicketDAO {
 
                 ResultSet resultSet = statement.getGeneratedKeys();
                 if (resultSet.next()) {
-                      return new Ticket(resultSet.getInt(1), userId, eventId, quantity, false);
+                    Ticket ticket = new Ticket(resultSet.getInt("id"), userId, eventId, quantity, false);
+                    statement.close();
+                    return ticket;
                 }
           } catch (SQLException e) {
                 e.printStackTrace();
@@ -95,6 +84,7 @@ public class ConcreteTicketDAO implements TicketDAO {
                   statement.setBoolean(1, true);
                   statement.setInt(2, ticketId);
                   statement.executeUpdate();
+                  statement.close();
                   return true;
           } catch (SQLException e) {
                e.printStackTrace();
@@ -109,6 +99,7 @@ public class ConcreteTicketDAO implements TicketDAO {
                PreparedStatement statement = connection.prepareStatement("DELETE FROM Ticket WHERE id = ?");
                statement.setInt(1, id);
                statement.executeUpdate();
+               statement.close();
                return true;
           } catch (SQLException e) {
                e.printStackTrace();

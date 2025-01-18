@@ -1,55 +1,85 @@
 package org.swe.business;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.swe.core.DAO.UserDAO;
+import org.swe.core.DTO.CreateUserDTO;
 import org.swe.core.DTO.LoginDTO;
-import org.swe.core.exceptions.UnauthorizedException;
+import org.swe.core.exceptions.BadRequestException;
+import org.swe.model.User;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-public class UserControllerTest {
+class UserControllerTest {
 
-    private AuthService mockAuthService;
+    private AuthService authServiceMock;
+    private UserDAO userDAOMock;
     private UserController userController;
 
     @BeforeEach
-    public void setUp() {
-        mockAuthService = Mockito.mock(AuthService.class);
-        userController = new UserController(mockAuthService);
+    void setUp() {
+        authServiceMock = mock(AuthService.class);
+        userDAOMock = mock(UserDAO.class);
+        userController = new UserController(authServiceMock, userDAOMock);
     }
 
     @Test
-    public void testLoginSuccess() {
-        String email = "user@example.com";
+    void loginShouldReturnTokenWhenValidCredentials() {
         String password = "password";
-        String expectedToken = "validToken";
+        LoginDTO dto = new LoginDTO("mario.rossi@gmail.com", password);
+        User user = new User("Mario", "Rossi", User.hashPassword(password), "mario.rossi@gmail.com",1);
 
-        LoginDTO dto = new LoginDTO(email, password);
+        when(userDAOMock.getUserByEmail(dto.email)).thenReturn(user);
+        when(authServiceMock.authenticateWithPassword(user, dto.password)).thenReturn("token123");
 
-        when(mockAuthService.authenticate(email, password)).thenReturn(expectedToken);
+        String token = userController.login(dto);
 
-        String actualToken = userController.login(dto);
-
-        assertEquals(expectedToken, actualToken, "The token should match the expected one");
-        verify(mockAuthService, times(1)).authenticate(email, password);
-
+        assertEquals("token123", token);
+        verify(userDAOMock).getUserByEmail(dto.email);
+        verify(authServiceMock).authenticateWithPassword(user, dto.password);
     }
 
     @Test
-    public void testLoginFailure() {
-        String email = "user@example.com";
-        String password = "wrongPassword";
+    void loginShouldThrowBadRequestExceptionWhenUserNotFound() {
+        LoginDTO dto = new LoginDTO("invalid@example.com", "password");
 
-        LoginDTO dto = new LoginDTO(email, password);
-        when(mockAuthService.authenticate(email, password)).thenReturn(null);
-        assertThrows(UnauthorizedException.class, () -> userController.login(dto));
+        when(userDAOMock.getUserByEmail(dto.email)).thenReturn(null);
 
-        verify(mockAuthService, times(1)).authenticate(email, password);
-
+        assertThrows(BadRequestException.class, () -> userController.login(dto));
+        verify(userDAOMock).getUserByEmail(dto.email);
     }
 
+    @Test
+    void signupShouldReturnTokenWhenUserIsCreated() {
+        String password = "password";
+        CreateUserDTO dto = new CreateUserDTO("Mario", "Rossi", "mario.rossi@gmail.com", password);
+        User newUser = new User("Mario", "Rossi", User.hashPassword(password), "mario.rossi@gmail.com",2);
+
+        when(userDAOMock.createUser(dto.getName(), dto.getSurname(), dto.getPassword(), dto.getEmail()))
+                .thenReturn(newUser);
+        when(authServiceMock.generateAccessToken(newUser)).thenReturn("newToken123");
+
+        String token = userController.signup(dto);
+
+        assertEquals("newToken123", token);
+        verify(userDAOMock).createUser(dto.getName(), dto.getSurname(), dto.getPassword(), dto.getEmail());
+        verify(authServiceMock).generateAccessToken(newUser);
+    }
+
+    @Test
+    void signupShouldThrowBadRequestExceptionWhenUserAlreadyExists() {
+        CreateUserDTO dto = new CreateUserDTO("Mario", "Rossi", "password", "mario.rossi@gmail.com");
+
+        when(userDAOMock.createUser(dto.getName(), dto.getSurname(), dto.getPassword(), dto.getEmail()))
+                .thenThrow(new RuntimeException("User already exists"));
+
+        assertThrows(BadRequestException.class, () -> userController.signup(dto));
+    }
+
+    @Test
+    void signupShouldThrowBadRequestExceptionWhenEmailFormatIsInvalid() {
+        CreateUserDTO dto = new CreateUserDTO("Mario", "Rossi",  "mario.rossi", "password");
+        assertThrows(BadRequestException.class, () -> userController.signup(dto));
+
+    }
 }

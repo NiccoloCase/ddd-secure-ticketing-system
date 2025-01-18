@@ -18,18 +18,17 @@ import org.swe.model.VerifySession;
 import io.jsonwebtoken.Claims;
 
 public class GuestController extends UserController {
-    private VerifySessionService verifySessionService;
-    private EventDAO eventDAO;
-    private TicketDAO ticketDAO;
-    private UserDAO userDAO;
+    private final VerifySessionService verifySessionService;
+    private final EventDAO eventDAO;
+    private final TicketDAO ticketDAO;
 
-    public GuestController(AuthService authHandler, VerifySessionService verifySessionService, EventDAO eventDAO,
+    public GuestController(AuthService authService, VerifySessionService verifySessionService, EventDAO eventDAO,
             TicketDAO ticketDAO, UserDAO userDAO) {
-        super(authHandler);
+        super(authService, userDAO);
+
         this.verifySessionService = verifySessionService;
         this.eventDAO = eventDAO;
         this.ticketDAO = ticketDAO;
-        this.userDAO = userDAO;
     }
 
     public Ticket buyTicket(BuyTicketDTO dto, String token) {

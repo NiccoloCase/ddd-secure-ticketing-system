@@ -25,7 +25,7 @@ public class AdminController extends UserController {
 
     public AdminController(AuthService authService, EventDAO eventDAO, UserDAO userDAO, AdminDAO adminDAO,
             StaffDAO staffDAO) {
-        super(authService);
+        super(authService,userDAO);
         this.eventDAO = eventDAO;
         this.userDAO = userDAO;
         this.adminDAO = adminDAO;

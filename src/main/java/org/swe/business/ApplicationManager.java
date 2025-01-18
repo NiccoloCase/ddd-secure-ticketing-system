@@ -45,7 +45,7 @@ public final class ApplicationManager {
 
     public StaffController getStaffController() {
         if (staffController == null) {
-            staffController = new StaffController(authService, verifySessionService);
+            staffController = new StaffController(authService, verifySessionService,userDAO);
         }
         return staffController;
     }

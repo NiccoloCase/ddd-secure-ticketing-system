@@ -2,9 +2,13 @@ package org.swe.business;
 
 import org.swe.core.DAO.ConcreteUserDAO;
 import org.swe.core.DAO.UserDAO;
+import org.swe.core.DTO.CreateUserDTO;
 import org.swe.core.DTO.LoginDTO;
+import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.core.utils.JWTUtility;
+import org.swe.core.validation.MyValidationResult;
+import org.swe.core.validation.MyValidator;
 import org.swe.model.User;
 
 import io.jsonwebtoken.Claims;
@@ -12,31 +16,36 @@ import io.jsonwebtoken.Claims;
 public class UserController {
 
     private final AuthService authService;
-    private final UserDAO userDAO = new ConcreteUserDAO();
+    private final UserDAO userDAO;
 
-    public UserController(AuthService authService) {
+    public UserController(AuthService authService, UserDAO userDAO) {
         this.authService = authService;
+        this.userDAO = userDAO;
     }
 
     public String login(LoginDTO dto) {
-        String token = authService.authenticate(dto.email, dto.password);
+        validationInterceptor(dto);
 
-        if (token != null) {
-            return token;
-        } else {
-            throw new UnauthorizedException("Invalid email or password");
+        User user = userDAO.getUserByEmail(dto.email);
+        if(user == null){
+            throw new BadRequestException("User not found");
+        }
+
+        return authService.authenticateWithPassword(user, dto.password);
+    }
+
+    public String signup(CreateUserDTO dto) {
+        validationInterceptor(dto);
+        try {
+            User newUser = userDAO.createUser(dto.getName(), dto.getSurname(), dto.getPassword(), dto.getEmail());
+            return authService.generateAccessToken(newUser);
+        }
+        catch (Exception e) {
+            throw new BadRequestException("User already exists");
         }
     }
 
-    public void signup() {
-        // TODO
-        // ritorna il token di autnentizazione (quindi fa il login dopo aver creare il profilo utente)
 
-    }
-
-    public boolean validateToken(String token) {
-        return authService.validateToken(token) != null;
-    }
 
     protected User authInterceptor(String token) {
         Claims claims = JWTUtility.validateToken(token);
@@ -52,5 +61,13 @@ public class UserController {
             throw new UnauthorizedException("User not found.");
         }
         return user;
+    }
+
+    protected void validationInterceptor(Object dto) {
+        MyValidator<Object> validator = new MyValidator<>();
+        MyValidationResult<Object> result = validator.validate(dto);
+        if (result.hasErrors()) {
+            throw new BadRequestException(result.getErrorMessage());
+        }
     }
 }

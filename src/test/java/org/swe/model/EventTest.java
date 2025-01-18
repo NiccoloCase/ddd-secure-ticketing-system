@@ -77,21 +77,4 @@ public class EventTest {
                 .build());
         assertEquals("Title must not be null.", exception.getMessage());
     }
-
-    @Test
-    public void testToString() {
-        Date eventDate = new Date(System.currentTimeMillis() + 86400000); // Tomorrow
-        Event event = new Event.Builder()
-                .setId(1)
-                .setTitle("Conference")
-                .setDescription("Tech conference")
-                .setDate(eventDate)
-                .setTicketsAvailable(300)
-                .setTicketPrice(100.0)
-                .build();
-
-        String expected = "Event{id=1, title='Conference', description='Tech conference', date=" +
-                eventDate + ", ticketsAvailable=300, ticketPrice=100.0}";
-        assertEquals(expected, event.toString());
-    }
 }

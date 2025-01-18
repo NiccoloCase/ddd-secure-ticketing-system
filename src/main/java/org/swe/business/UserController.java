@@ -5,6 +5,7 @@ import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.LoginDTO;
 import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.NotFoundException;
+import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.core.utils.JWTUtility;
 import org.swe.model.User;
 
@@ -25,7 +26,7 @@ public class UserController {
         if (token != null) {
             return token;
         } else {
-            throw new NotFoundException("Invalid email or password");
+            throw new UnauthorizedException("Invalid email or password");
         }
     }
 

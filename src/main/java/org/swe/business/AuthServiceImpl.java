@@ -2,50 +2,33 @@ package org.swe.business;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.swe.core.DAO.ConcreteUserDAO;
-import org.swe.core.DAO.UserDAO;
-import org.swe.core.exceptions.NotFoundException;
+import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.core.utils.JWTUtility;
-import org.swe.core.utils.PasswordUtility;
 import org.swe.model.User;
-
 import io.jsonwebtoken.Claims;
 
 public class AuthServiceImpl implements AuthService {
-
-    private final UserDAO userDAO = new ConcreteUserDAO();
 
     public AuthServiceImpl() {
     }
 
     @Override
-    public String authenticate(String email, String password) {
-        
-        User user = userDAO.getUserByEmail(email);
-        if (user == null) {
-            throw new NotFoundException("User not found.");
+    public String authenticateWithPassword(User user, String password) throws UnauthorizedException {
+        if(!user.isPasswordCorrect(password)){
+            throw new UnauthorizedException("Invalid credentials");
         }
-
-        String passwordHash = user.getPasswordHash();
-
-        // TODO use new user.isPasswordCorrect()
-        if (!PasswordUtility.checkPassword(password, passwordHash)) {
-            throw new NotFoundException("PasswordHash not found in database.");
-        }
-        if (!PasswordUtility.checkPassword(password, user.getPasswordHash())) {
-            throw new NotFoundException("Invalid password.");
-        }
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
-
-        return JWTUtility.generateToken(claims);
+        return this.generateAccessToken(user);
     }
 
     @Override
-    public Claims validateToken(String token) {
+    public Claims validateAccessToken(String token) {
         return JWTUtility.validateToken(token);
     }
-    
+
+    @Override
+    public String generateAccessToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        return JWTUtility.generateToken(claims);
+    }
 }

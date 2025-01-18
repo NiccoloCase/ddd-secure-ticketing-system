@@ -32,6 +32,14 @@ public class MyValidationResult<T> {
                 .collect(Collectors.toSet());
     }
 
+    public String getErrorMessage() {
+        return errors.stream()
+                .map(error -> error.field() + ": " + error.message())
+                .collect(Collectors.joining(", "));
+    }
+
+
+
     public record ValidationError(
             String field,
             String message,

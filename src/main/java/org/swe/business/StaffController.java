@@ -1,5 +1,6 @@
 package org.swe.business;
 
+import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.GetVerificationSessionResultDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
@@ -9,12 +10,14 @@ public class StaffController extends UserController {
 
     private final VerifySessionService verifySessionService;
 
-    public StaffController(AuthService authService, VerifySessionService verifySessionService) {
-        super(authService);
+    public StaffController(AuthService authService, VerifySessionService verifySessionService, UserDAO userDAO) {
+        super(authService, userDAO);
         this.verifySessionService = verifySessionService;
     }
 
     public String startVerificationSession(StartVerificationSessionDTO payload) {
+        validationInterceptor(payload);
+
         VerifySession verifySession = new VerifySession(
                 12, // TODO replace with actual staff id
                 payload.getEventId(),
@@ -24,6 +27,7 @@ public class StaffController extends UserController {
     }
 
     public void getVerificationSessionResult(GetVerificationSessionResultDTO payload) throws BadRequestException {
+        validationInterceptor(payload);
 
         // Auth
         // TODO

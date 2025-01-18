@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.swe.core.DAO.EventDAO;
 import org.swe.core.DAO.TicketDAO;
+import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.BuyTicketDTO;
 import org.swe.core.DTO.ScanStaffVerificationCodeDTO;
 import org.swe.core.exceptions.BadRequestException;
@@ -22,19 +23,22 @@ import org.swe.model.VerifySession;
 import io.jsonwebtoken.Claims;
 
 public class GuestController extends UserController {
-    private VerifySessionService verifySessionService;
-    private EventDAO eventDAO;
-    private TicketDAO ticketDAO;
+    private final VerifySessionService verifySessionService;
+    private final EventDAO eventDAO;
+    private final TicketDAO ticketDAO;
+    private UserDAO userDAO;
 
     public GuestController(AuthService authHandler, VerifySessionService verifySessionService, EventDAO eventDAO,
-            TicketDAO ticketDAO) {
-        super(authHandler);
+            TicketDAO ticketDAO, UserDAO userDAO) {
+        super(authHandler, userDAO);
         this.verifySessionService = verifySessionService;
         this.eventDAO = eventDAO;
         this.ticketDAO = ticketDAO;
+        this.userDAO = userDAO;
     }
 
     public Ticket buyTicket(BuyTicketDTO dto, String token) {
+        validationInterceptor(dto);
 
         User user = authInterceptor(token);
 
@@ -49,21 +53,12 @@ public class GuestController extends UserController {
         }
 
         PaymentContext paymentContext = new PaymentContext();
-        PaymentStrategy paymentStrategy;
-
-        switch (dto.getPaymentMethod()) { // Utilizzo dell'enum
-            case GOOGLE_PAY:
-                paymentStrategy = new GooglePayPayment();
-                break;
-            case CREDIT_CARD:
-                paymentStrategy = new CreditCardPayment();
-                break;
-            case APPLE_PAY:
-                paymentStrategy = new ApplePayPayment();
-                break;
-            default:
-                throw new BadRequestException("Unsupported payment method.");
-        }
+        PaymentStrategy paymentStrategy = switch (dto.getPaymentMethod()) { 
+            case GOOGLE_PAY -> new GooglePayPayment();
+            case CREDIT_CARD -> new CreditCardPayment();
+            case APPLE_PAY -> new ApplePayPayment();
+            default -> throw new BadRequestException("Unsupported payment method.");
+        };
 
         paymentContext.setPaymentStrategy(paymentStrategy);
         boolean paymentSuccess = paymentContext.executePayment(event.getTicketPrice() * dto.getQuantity());

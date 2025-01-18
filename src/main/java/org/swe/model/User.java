@@ -17,6 +17,15 @@ public class User {
         this.id = id;
     }
 
+    public static String hashPassword(String password) {
+        return PasswordUtility.hashPassword(password);
+    }
+
+    public boolean isPasswordCorrect(String password) {
+        return PasswordUtility.checkPassword(password, passwordHash);
+    }
+
+
     public String getName() {
         return name;
     }
@@ -57,7 +66,5 @@ public class User {
         this.id = id;
     }
 
-    public boolean isPasswordCorrect(String password) {
-        return PasswordUtility.checkPassword(password, passwordHash);
-    }
+
 }

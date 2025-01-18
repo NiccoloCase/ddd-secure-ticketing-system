@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.swe.core.DBM.DBManager;
+import org.swe.core.utils.PasswordUtility;
 import org.swe.model.User;
 
 public class ConcreteUserDAO implements UserDAO {
@@ -99,8 +100,10 @@ public class ConcreteUserDAO implements UserDAO {
      }
 
      @Override
-     public User createUser(String name, String surname, String passwordHash, String email) {
+     public User createUser(String name, String surname, String clearPassword, String email) {
           User newUser = null;
+          String passwordHash = User.hashPassword(clearPassword);
+
           try {
                Connection connection = dbManager.getConnection();
 

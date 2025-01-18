@@ -25,7 +25,7 @@ public class AdminController extends UserController {
 
     public AdminController(AuthService authService, EventDAO eventDAO, UserDAO userDAO, AdminDAO adminDAO,
             StaffDAO staffDAO) {
-        super(authService);
+        super(authService,userDAO);
         this.eventDAO = eventDAO;
         this.userDAO = userDAO;
         this.adminDAO = adminDAO;
@@ -33,7 +33,7 @@ public class AdminController extends UserController {
     }
 
     public boolean createEvent(CreateEventDTO dto, String token) throws InternalServerErrorException {
-
+        validationInterceptor(dto);
         User user = authInterceptor(token);
 
         Event newEvent = eventDAO.createEvent(
@@ -54,7 +54,7 @@ public class AdminController extends UserController {
     }
 
     public boolean deleteEvent(int eventId, String token) throws UnauthorizedException {
-
+        validationInterceptor(eventId);
         User user = authInterceptor(token);
 
         boolean isAdmin = eventDAO.isUserAdminOfEvent(user.getId(), eventId);
@@ -66,7 +66,7 @@ public class AdminController extends UserController {
     }
 
     public boolean updateEvent(UpdateEventDTO dto, String token) throws UnauthorizedException {
-
+        validationInterceptor(dto);
         User user = authInterceptor(token);
 
         boolean isAdmin = eventDAO.isUserAdminOfEvent(user.getId(), dto.getEventId());
@@ -84,7 +84,6 @@ public class AdminController extends UserController {
     }
 
     public List<Event> getAllEvents(String token) {
-
         User user = authInterceptor(token);
 
         // restituisce solo eventi di cui è admin.
@@ -93,7 +92,7 @@ public class AdminController extends UserController {
     }
 
     public void addStaff(AddStaffToEventDTO dto, String token) {
-
+        validationInterceptor(dto);
         User user = authInterceptor(token);
 
         boolean isAdmin = eventDAO.isUserAdminOfEvent(user.getId(), dto.getEventId());
@@ -113,7 +112,7 @@ public class AdminController extends UserController {
     }
 
     public void removeStaff(RemoveStaffFromEventDTO dto, String token) {
-
+        validationInterceptor(dto);
         User user = authInterceptor(token);
 
         boolean isAdmin = eventDAO.isUserAdminOfEvent(user.getId(), dto.getEventId());

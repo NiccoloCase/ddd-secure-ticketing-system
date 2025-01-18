@@ -10,7 +10,12 @@ import org.swe.core.DTO.ScanStaffVerificationCodeDTO;
 import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.utils.JWTUtility;
+import org.swe.model.ApplePayPayment;
+import org.swe.model.CreditCardPayment;
 import org.swe.model.Event;
+import org.swe.model.GooglePayPayment;
+import org.swe.model.PaymentContext;
+import org.swe.model.PaymentStrategy;
 import org.swe.model.Ticket;
 import org.swe.model.User;
 import org.swe.model.VerifySession;
@@ -18,17 +23,18 @@ import org.swe.model.VerifySession;
 import io.jsonwebtoken.Claims;
 
 public class GuestController extends UserController {
-    private final VerifySessionService verifySessionService;
-    private final EventDAO eventDAO;
-    private final TicketDAO ticketDAO;
+    private VerifySessionService verifySessionService;
+    private EventDAO eventDAO;
+    private TicketDAO ticketDAO;
+    private UserDAO userDAO;
 
-    public GuestController(AuthService authService, VerifySessionService verifySessionService, EventDAO eventDAO,
+    public GuestController(AuthService authHandler, VerifySessionService verifySessionService, EventDAO eventDAO,
             TicketDAO ticketDAO, UserDAO userDAO) {
-        super(authService, userDAO);
-
+        super(authHandler);
         this.verifySessionService = verifySessionService;
         this.eventDAO = eventDAO;
         this.ticketDAO = ticketDAO;
+        this.userDAO = userDAO;
     }
 
     public Ticket buyTicket(BuyTicketDTO dto, String token) {
@@ -45,7 +51,29 @@ public class GuestController extends UserController {
             throw new BadRequestException("Not enough tickets available.");
         }
 
-        // TODO: user sceglie il PaymentMethod e paga
+        PaymentContext paymentContext = new PaymentContext();
+        PaymentStrategy paymentStrategy;
+
+        switch (dto.getPaymentMethod()) { // Utilizzo dell'enum
+            case GOOGLE_PAY:
+                paymentStrategy = new GooglePayPayment();
+                break;
+            case CREDIT_CARD:
+                paymentStrategy = new CreditCardPayment();
+                break;
+            case APPLE_PAY:
+                paymentStrategy = new ApplePayPayment();
+                break;
+            default:
+                throw new BadRequestException("Unsupported payment method.");
+        }
+
+        paymentContext.setPaymentStrategy(paymentStrategy);
+        boolean paymentSuccess = paymentContext.executePayment(event.getTicketPrice() * dto.getQuantity());
+
+        if (!paymentSuccess) {
+            throw new BadRequestException("Payment failed. Please try again.");
+        }
 
         boolean success = eventDAO.updateEvent(
                 event.getId(),

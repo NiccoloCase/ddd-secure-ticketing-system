@@ -38,7 +38,7 @@ public final class ApplicationManager {
 
     public GuestController getGuestController() {
         if (guestController == null) {
-            guestController = new GuestController(authService, verifySessionService, eventDAO, ticketDAO, userDAO);
+            guestController = new GuestController(authService, verifySessionService, eventDAO, ticketDAO);
         }
         return guestController;
     }

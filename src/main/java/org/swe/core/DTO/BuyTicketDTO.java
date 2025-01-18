@@ -1,5 +1,7 @@
 package org.swe.core.DTO;
 
+import org.swe.model.PaymentMethod;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -11,11 +13,13 @@ public class BuyTicketDTO {
     @Min(value = 1, message = "Quantity must be greater than 0.")
     private Integer quantity;
 
+    @NotNull(message = "Payment method cannot be null.")
+    private PaymentMethod paymentMethod;
 
-    // TODO add payment method
+
     public Integer getEventId() {
         return eventId;
-    }
+    }   
 
     public void setEventId(Integer eventId) {
         this.eventId = eventId;
@@ -27,6 +31,14 @@ public class BuyTicketDTO {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
 

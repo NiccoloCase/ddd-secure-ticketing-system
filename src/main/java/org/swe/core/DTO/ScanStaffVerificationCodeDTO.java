@@ -7,4 +7,8 @@ public class ScanStaffVerificationCodeDTO {
     @NotNull
     private String code;
 
+    public String getCode() {
+        return code;
+    }
+
 }

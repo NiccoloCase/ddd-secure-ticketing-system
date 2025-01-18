@@ -30,7 +30,7 @@ public class GuestController extends UserController {
 
     public GuestController(AuthService authHandler, VerifySessionService verifySessionService, EventDAO eventDAO,
             TicketDAO ticketDAO, UserDAO userDAO) {
-        super(authHandler);
+        super(authHandler, userDAO);
         this.verifySessionService = verifySessionService;
         this.eventDAO = eventDAO;
         this.ticketDAO = ticketDAO;
@@ -52,21 +52,12 @@ public class GuestController extends UserController {
         }
 
         PaymentContext paymentContext = new PaymentContext();
-        PaymentStrategy paymentStrategy;
-
-        switch (dto.getPaymentMethod()) { // Utilizzo dell'enum
-            case GOOGLE_PAY:
-                paymentStrategy = new GooglePayPayment();
-                break;
-            case CREDIT_CARD:
-                paymentStrategy = new CreditCardPayment();
-                break;
-            case APPLE_PAY:
-                paymentStrategy = new ApplePayPayment();
-                break;
-            default:
-                throw new BadRequestException("Unsupported payment method.");
-        }
+        PaymentStrategy paymentStrategy = switch (dto.getPaymentMethod()) { 
+            case GOOGLE_PAY -> new GooglePayPayment();
+            case CREDIT_CARD -> new CreditCardPayment();
+            case APPLE_PAY -> new ApplePayPayment();
+            default -> throw new BadRequestException("Unsupported payment method.");
+        };
 
         paymentContext.setPaymentStrategy(paymentStrategy);
         boolean paymentSuccess = paymentContext.executePayment(event.getTicketPrice() * dto.getQuantity());

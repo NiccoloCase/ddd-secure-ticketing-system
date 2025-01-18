@@ -38,14 +38,14 @@ public final class ApplicationManager {
 
     public GuestController getGuestController() {
         if (guestController == null) {
-            guestController = new GuestController(authService, verifySessionService, eventDAO, ticketDAO);
+            guestController = new GuestController(authService, verifySessionService, eventDAO, ticketDAO , userDAO);
         }
         return guestController;
     }
 
     public StaffController getStaffController() {
         if (staffController == null) {
-            staffController = new StaffController(authService, verifySessionService,userDAO);
+            staffController = new StaffController(authService, verifySessionService, userDAO);
         }
         return staffController;
     }

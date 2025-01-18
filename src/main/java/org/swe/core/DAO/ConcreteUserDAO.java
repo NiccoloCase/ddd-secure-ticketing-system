@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import org.swe.core.dbManager.DBManager;
+import org.swe.core.DBM.DBManager;
 import org.swe.model.User;
 
 //i campi sono degli esempi andranno quasi certamente modificati con quelli reali 
@@ -16,9 +16,10 @@ public class ConcreteUserDAO implements UserDAO {
      private DBManager dbManager;
 
      public ConcreteUserDAO() {
-          dbManager = DBManager.getInstance();
+          this.dbManager = DBManager.getInstance();
      }
 
+     @Override
      public User getUser(int id) {
           try {
                Connection connection = dbManager.getConnection();

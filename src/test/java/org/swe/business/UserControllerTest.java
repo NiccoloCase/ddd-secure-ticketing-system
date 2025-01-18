@@ -45,9 +45,7 @@ public class UserControllerTest {
         String password = "wrongPassword";
 
         LoginDTO dto = new LoginDTO(email, password);
-
         when(mockAuthService.authenticate(email, password)).thenReturn(null);
-
         assertThrows(UnauthorizedException.class, () -> userController.login(dto));
 
         verify(mockAuthService, times(1)).authenticate(email, password);

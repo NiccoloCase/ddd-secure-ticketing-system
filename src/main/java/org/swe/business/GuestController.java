@@ -1,5 +1,6 @@
 package org.swe.business;
 
+import org.swe.core.DTO.ScanStaffVerificationCodeDTO;
 import org.swe.model.Ticket;
 
 public class GuestController extends UserController {
@@ -15,7 +16,7 @@ public class GuestController extends UserController {
         return null;
     }
 
-    public boolean proveTicketValidity(int ticketId, int eventId) {
+    public boolean scanStaffVerificationCodeDTO(ScanStaffVerificationCodeDTO dto) {
         // TODO: user scanneriza il ticket, vediamo se è valido per l'evento e l'utente
         return true;
     }

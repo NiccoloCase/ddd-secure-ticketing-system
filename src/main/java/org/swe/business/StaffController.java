@@ -51,5 +51,8 @@ public class StaffController extends UserController {
         // TODO
 
 
+        // Create the code for the qr code
+
+
     }
 }

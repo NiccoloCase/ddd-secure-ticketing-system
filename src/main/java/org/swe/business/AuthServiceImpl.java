@@ -29,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
 
         String passwordHash = user.getPasswordHash();
 
+        // TODO use new user.isPasswordCorrect()
         if (!PasswordUtility.checkPassword(password, passwordHash)) {
             throw new NotFoundException("PasswordHash not found in database.");
         }

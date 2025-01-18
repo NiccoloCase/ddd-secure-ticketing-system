@@ -171,4 +171,26 @@ public class ConcreteEventDAO implements EventDAO {
           }
           return false;
      }
+
+     @Override
+     public boolean isUserAdminOfEvent(int userId, int eventId) {
+          try {
+              Connection conn = dbManager.getConnection();
+              PreparedStatement stmt = conn.prepareStatement(
+                  "SELECT 1 FROM Admin WHERE user_id = ? AND event_id = ?"
+              );
+              stmt.setInt(1, userId);
+              stmt.setInt(2, eventId);
+      
+              ResultSet rs = stmt.executeQuery();
+              boolean exists = rs.next();
+              rs.close();
+              stmt.close();
+              return exists;
+      
+          } catch (SQLException e) {
+              e.printStackTrace();
+          }
+          return false;
+      }
 }

@@ -11,4 +11,5 @@ public interface EventDAO {
     Event createEvent(String title, String description, Date date, int ticketsAvailable, double ticketPrice);
     boolean updateEvent(int id, String title, String description, Date date, int ticketsAvailable, double ticketPrice);
     boolean deleteEvent(int id);
+    boolean isUserAdminOfEvent(int userId, int eventId);
 }

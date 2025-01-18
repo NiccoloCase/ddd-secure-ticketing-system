@@ -2,15 +2,17 @@ package org.swe.business;
 
 import java.util.List;
 
+import org.swe.core.DAO.AdminDAO;
 import org.swe.core.DAO.EventDAO;
+import org.swe.core.DAO.StaffDAO;
 import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.AddStaffToEventDTO;
 import org.swe.core.DTO.CreateEventDTO;
 import org.swe.core.DTO.RemoveStaffFromEventDTO;
 import org.swe.core.DTO.UpdateEventDTO;
+import org.swe.core.exceptions.InternalServerErrorException;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.exceptions.UnauthorizedException;
-import org.swe.model.Admin;
 import org.swe.model.Event;
 import org.swe.model.User;
 
@@ -18,112 +20,116 @@ public class AdminController extends UserController {
 
     private EventDAO eventDAO;
     private UserDAO userDAO;
+    private AdminDAO adminDAO;
+    private StaffDAO staffDAO;
 
-    public AdminController(AuthService authService, EventDAO eventDAO, UserDAO userDAO) {
+    public AdminController(AuthService authService, EventDAO eventDAO, UserDAO userDAO, AdminDAO adminDAO,
+            StaffDAO staffDAO) {
         super(authService);
         this.eventDAO = eventDAO;
         this.userDAO = userDAO;
+        this.adminDAO = adminDAO;
+        this.staffDAO = staffDAO;
     }
 
-    public boolean createEvent(CreateEventDTO dto, String token) {
+    public boolean createEvent(CreateEventDTO dto, String token) throws InternalServerErrorException {
 
         User user = authInterceptor(token);
 
-        // TODO: Forse levare? guest e staff possono creare eventi?
-        if (!(user instanceof Admin)) {
-            throw new UnauthorizedException("Not authorized. Must be admin.");
+        Event newEvent = eventDAO.createEvent(
+                dto.getTitle(),
+                dto.getDescription(),
+                dto.getDate(),
+                dto.getTicketsAvailable(),
+                dto.getTicketPrice());
+        if (newEvent == null) {
+            throw new InternalServerErrorException("Event creation failed");
+        }
+        boolean success = adminDAO.addAdminToEvent(user.getId(), newEvent.getId());
+        if (!success) {
+            throw new InternalServerErrorException("Failed to add user as admin to event");
         }
 
-        Event event = new Event.Builder()
-                .setTitle(dto.getTitle())
-                .setDescription(dto.getDescription())
-                .setDate(dto.getDate())
-                .setTicketsAvailable(dto.getTicketsAvailable())
-                .setTicketPrice(dto.getTicketPrice())
-                .build();
-
-        return eventDAO.addEvent(event);
+        return true;
     }
 
-    public boolean deleteEvent(int eventId, String token) {
+    public boolean deleteEvent(int eventId, String token) throws UnauthorizedException {
+
         User user = authInterceptor(token);
-        if (!(user instanceof Admin)) {
-            throw new UnauthorizedException("Not authorized. Must be admin.");
+
+        boolean isAdmin = eventDAO.isUserAdminOfEvent(user.getId(), eventId);
+        if (!isAdmin) {
+            throw new UnauthorizedException("Not authorized: user is not Admin of this event.");
         }
+
         return eventDAO.deleteEvent(eventId);
     }
 
-    public boolean updateEvent(UpdateEventDTO dto, String token) {
+    public boolean updateEvent(UpdateEventDTO dto, String token) throws UnauthorizedException {
+
         User user = authInterceptor(token);
-        if (!(user instanceof Admin)) {
-            throw new UnauthorizedException("Not authorized. Must be admin.");
+
+        boolean isAdmin = eventDAO.isUserAdminOfEvent(user.getId(), dto.getEventId());
+        if (!isAdmin) {
+            throw new UnauthorizedException("Not authorized: user is not Admin of this event.");
         }
 
-        Event event = new Event.Builder()
-                .setTitle(dto.getTitle())
-                .setDescription(dto.getDescription())
-                .setDate(dto.getDate())
-                .setTicketsAvailable(dto.getTicketsAvailable())
-                .setTicketPrice(dto.getTicketPrice())
-                .setId(dto.getEventId())
-                .build();
-
-        return eventDAO.updateEvent(event);
+        return eventDAO.updateEvent(
+                dto.getEventId(),
+                dto.getTitle(),
+                dto.getDescription(),
+                dto.getDate(),
+                dto.getTicketsAvailable(),
+                dto.getTicketPrice());
     }
 
     public List<Event> getAllEvents(String token) {
+
         User user = authInterceptor(token);
 
-        if (!(user instanceof Admin)) {
-            throw new UnauthorizedException("Not authorized. Must be admin.");
-        }
+        // restituisce solo eventi di cui è admin.
 
-        // TODO: Cerca tutti gli eventi di qui l'utente è admin e ritorna la lista
-
-        return eventDAO.getAllEvents();
+        return adminDAO.getEventsByAdminUserId(user.getId());
     }
 
     public void addStaff(AddStaffToEventDTO dto, String token) {
 
         User user = authInterceptor(token);
 
-        if (!(user instanceof Admin)) {
-            throw new UnauthorizedException("Not authorized. Must be admin.");
+        boolean isAdmin = eventDAO.isUserAdminOfEvent(user.getId(), dto.getEventId());
+        if (!isAdmin) {
+            throw new UnauthorizedException("Not authorized: user is not Admin of this event.");
         }
 
-        // cerco l'user dato l'email nel dto e creo lo staff.
-
-        User dbUser = userDAO.findUserByEmail(dto.getStaffEmail());
-
+        User dbUser = userDAO.getUserByEmail(dto.getStaffEmail());
         if (dbUser == null) {
             throw new NotFoundException("User not found.");
         }
 
-        // TODO: aggiungere lo staff all'evento dato l'id dell'evento
-
+        boolean success = staffDAO.addStaffToEvent(dbUser.getId(), dto.getEventId());
+        if (!success) {
+            throw new RuntimeException("Failed to add staff to event.");
+        }
     }
 
     public void removeStaff(RemoveStaffFromEventDTO dto, String token) {
+
         User user = authInterceptor(token);
 
-        if (!(user instanceof Admin)) {
-            throw new UnauthorizedException("Not authorized. Must be admin.");
+        boolean isAdmin = eventDAO.isUserAdminOfEvent(user.getId(), dto.getEventId());
+        if (!isAdmin) {
+            throw new UnauthorizedException("Not authorized: user is not Admin of this event.");
         }
 
-        User dbUser = userDAO.findUserByEmail(dto.getStaffEmail());
-
+        User dbUser = userDAO.getUserByEmail(dto.getStaffEmail());
         if (dbUser == null) {
             throw new NotFoundException("User not found.");
-
         }
-    }
 
-    public void setEventDAO(EventDAO eventDAO) {
-        this.eventDAO = eventDAO;
-    }
-
-    public void setUserDAO(UserDAO userDAO) {
-        this.userDAO = userDAO;
+        boolean success = staffDAO.removeStaffFromEvent(dbUser.getId(), dto.getEventId());
+        if (!success) {
+            throw new RuntimeException("Failed to remove staff from event.");
+        }
     }
 
 }

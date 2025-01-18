@@ -47,7 +47,7 @@ public class UserController {
         if (userId == null) {
             throw new UnauthorizedException("userId is invalid.");
         }
-        User user = userDAO.getUser(userId);
+        User user = userDAO.getUserById(userId);
         if (user == null) {
             throw new UnauthorizedException("User not found.");
         }

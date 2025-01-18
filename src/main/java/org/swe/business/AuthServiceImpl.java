@@ -22,7 +22,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String authenticate(String email, String password) {
         
-        User user = userDAO.findUserByEmail(email);
+        User user = userDAO.getUserByEmail(email);
         if (user == null) {
             throw new NotFoundException("User not found.");
         }

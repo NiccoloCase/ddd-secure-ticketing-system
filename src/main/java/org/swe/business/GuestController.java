@@ -91,7 +91,7 @@ public class GuestController extends UserController {
         return newTicket;
     }
 
-    public boolean scanStaffVerificationCodeDTO(ScanStaffVerificationCodeDTO dto, String token) {
+    public boolean scanStaffVerificationCode(ScanStaffVerificationCodeDTO dto, String token) {
         User user = authInterceptor(token);
 
         String code = dto.getCode();

@@ -7,17 +7,18 @@ public class TicketTest {
 
     @Test
     public void testTicketConstructorAndGetters() {
-        Ticket ticket = new Ticket(1, 101, 2, false);
+        Ticket ticket = new Ticket(1, 101, 2,1, false);
 
         assertEquals(1, ticket.getId());
         assertEquals(101, ticket.getUserId());
-        assertEquals(2, ticket.getQuantity());
+        assertEquals(1, ticket.getQuantity());
+        assertEquals(2, ticket.getEventId());
         assertFalse(ticket.isUsed());
     }
 
     @Test
     public void testSetters() {
-        Ticket ticket = new Ticket(0, 0, 0, false);
+        Ticket ticket = new Ticket(0, 0, 0,0, false);
 
         ticket.setId(2);
         ticket.setUserId(102);

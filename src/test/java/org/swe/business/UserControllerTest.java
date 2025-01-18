@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.swe.core.DTO.LoginDTO;
+import org.swe.core.exceptions.UnauthorizedException;
 
 public class UserControllerTest {
 
@@ -47,7 +48,7 @@ public class UserControllerTest {
 
         when(mockAuthService.authenticate(email, password)).thenReturn(null);
 
-        assertThrows(IllegalArgumentException.class, () -> userController.login(dto));
+        assertThrows(UnauthorizedException.class, () -> userController.login(dto));
 
         verify(mockAuthService, times(1)).authenticate(email, password);
 

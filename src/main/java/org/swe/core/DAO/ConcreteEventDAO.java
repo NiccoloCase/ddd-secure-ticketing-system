@@ -7,16 +7,23 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.swe.core.DBM.DBManager;
+import org.swe.model.Admin;
 import org.swe.model.Event;
+import org.swe.model.Staff;
 
 public class ConcreteEventDAO implements EventDAO {
 
      private DBManager dbManager;
+     private StaffDAO staffDAO;
+     private AdminDAO adminDAO;
 
      public ConcreteEventDAO() {
           this.dbManager = DBManager.getInstance();
+          this.staffDAO = new ConcreteStaffDAO();
+          this.adminDAO = new ConcreteAdminDAO();
      }
 
      @Override
@@ -28,20 +35,27 @@ public class ConcreteEventDAO implements EventDAO {
                          "SELECT * FROM Event WHERE id = ?");
                statement.setInt(1, id);
 
-               ResultSet resultSet = statement.executeQuery();
-               if (resultSet.next()) {
-                    event = new Event.Builder()
-                              .setId(resultSet.getInt("id"))
-                              .setTitle(resultSet.getString("title"))
-                              .setDescription(resultSet.getString("description"))
-                              .setDate(resultSet.getDate("date")) // Attenzione: getDate() restituisce java.sql.Date
-                              .setTicketsAvailable(resultSet.getInt("tickets_available"))
-                              .setTicketPrice(resultSet.getDouble("ticket_price"))
-                              .build();
-               }
-               resultSet.close();
-               statement.close();
+               ResultSet rs = statement.executeQuery();
+               if (rs.next()) {
+                    Event.Builder builder = new Event.Builder()
+                              .setId(rs.getInt("id"))
+                              .setTitle(rs.getString("title"))
+                              .setDescription(rs.getString("description"))
+                              .setDate(rs.getTimestamp("date"))
+                              .setTicketsAvailable(rs.getInt("tickets_available"))
+                              .setTicketPrice(rs.getDouble("ticket_price"));
 
+
+                    List<Staff> staffList = staffDAO.getStaffByEventId(id);
+                    List<Admin> adminList = adminDAO.getAdminsByEventId(id);
+
+                    builder.setStaff(staffList);
+                    builder.setAdmins(adminList);
+
+                    event = builder.build();
+               }
+               rs.close();
+               statement.close();
           } catch (SQLException e) {
                e.printStackTrace();
           }

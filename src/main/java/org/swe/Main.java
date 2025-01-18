@@ -14,9 +14,15 @@ public class Main {
 
         DBManager dbManager = DBManager.getInstance();
 
-        // DAO test
-        System.out.println("DAO test");
+
+
+        // Ticket dao test
+        System.out.println("TicketDAO test");
         TicketDAO ticketDAO = new ConcreteTicketDAO();
+
+
+        // DAO test
+
         //UserDAO userDAO = new ConcreteUserDAO();
         EventDAO eventDAO = new ConcreteEventDAO();
 
@@ -42,6 +48,10 @@ public class Main {
         }*/
 
         System.out.println("EventDAO test");
+
+
+
+
 
         for (int i = 0; i < 3; i++) {
             Event event = new Event.Builder()
@@ -71,9 +81,30 @@ public class Main {
             .build();
         eventDAO.updateEvent(event);
         //eventDAO.getAllEvents().forEach(System.out::println);
+
+
+
+        // Create user
+        UserDAO userDAO = new ConcreteUserDAO();
+        User user = new User("name" ,"username", "password", "email", 1);
+        userDAO.addUser(user);
+
+        // Create ticket
+        Ticket ticket = ticketDAO.createTicket(1, 1, 1);
+
+
+
+
+
+        // drop all tables
         for (int i = 0; i < 3; i++) {
             eventDAO.deleteEvent(i+1);
         }
+
+        userDAO.deleteUser(1);
+        ticketDAO.deleteTicket(1);
+
+
 
         dbManager.close();
     }

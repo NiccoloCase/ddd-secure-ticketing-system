@@ -25,12 +25,12 @@ public class ConcreteTicketDAO implements TicketDAO {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                return new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("quantity"), resultSet.getBoolean("used"));
+                return new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"),  resultSet.getInt("event_id"), resultSet.getInt("quantity"), resultSet.getBoolean("used"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-            return null;
+        return null;
      }
 
     @Override
@@ -41,7 +41,7 @@ public class ConcreteTicketDAO implements TicketDAO {
                Statement statement = connection.createStatement();
                ResultSet resultSet = statement.executeQuery("SELECT * FROM Ticket");
                while (resultSet.next()) {
-                    tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("quantity"), resultSet.getBoolean("used")));
+                    tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("event_id"), resultSet.getInt("quantity"), resultSet.getBoolean("used")));
                }
                return tickets;
           } catch (SQLException e) {
@@ -58,7 +58,7 @@ public class ConcreteTicketDAO implements TicketDAO {
                statement.setInt(1, code);
                ResultSet resultSet = statement.executeQuery();
                if (resultSet.next()) {
-                    return new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("quantity"), resultSet.getBoolean("used"));
+                    return new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("event_id "), resultSet.getInt("quantity"), resultSet.getBoolean("used"));
                }
           } catch (SQLException e) {
                e.printStackTrace();
@@ -67,30 +67,33 @@ public class ConcreteTicketDAO implements TicketDAO {
      }
 
     @Override
-     public boolean addTicket(Ticket ticket) {
+     public Ticket createTicket(Integer userId, Integer eventId, Integer quantity) {
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("INSERT INTO Ticket (id, user_id, quantity, used) VALUES (?, ?, ?, ?)");
-               statement.setInt(1, ticket.getId());
-               statement.setInt(2, ticket.getUserId());
-               statement.setInt(3, ticket.getQuantity());
-               statement.setBoolean(4, ticket.isUsed());
+               PreparedStatement statement = connection.prepareStatement("INSERT INTO Ticket (user_id, event_id, quantity, used) VALUES (?, ?, ?, ?)");
+               statement.setInt(1, userId);
+                statement.setInt(2, eventId);
+               statement.setInt(3, quantity);
+               statement.setBoolean(4, false);
                statement.executeUpdate();
-               return true;
+
+                ResultSet resultSet = statement.getGeneratedKeys();
+                if (resultSet.next()) {
+                      return new Ticket(resultSet.getInt(1), userId, eventId, quantity, false);
+                }
           } catch (SQLException e) {
-               e.printStackTrace();
+                e.printStackTrace();
           }
-          return false;
+          return null;
      }
 
     @Override
-     public boolean updateTicket(Ticket ticket) {
+     public boolean setTicketUsed(Integer ticketId) {
           try {
                   Connection connection = dbManager.getConnection();
-                  PreparedStatement statement = connection.prepareStatement("UPDATE Ticket SET user_id = ?, used = ? WHERE id = ?");
-                  statement.setInt(1, ticket.getUserId());
-                  statement.setBoolean(2, ticket.isUsed());
-                  statement.setInt(3, ticket.getId());
+                  PreparedStatement statement = connection.prepareStatement("UPDATE Ticket SET used = ? WHERE id = ?");
+                  statement.setBoolean(1, true);
+                  statement.setInt(2, ticketId);
                   statement.executeUpdate();
                   return true;
           } catch (SQLException e) {

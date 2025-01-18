@@ -7,7 +7,7 @@ public interface TicketDAO {
      Ticket getTicketById(int id);
      ArrayList<Ticket> getAllTickets();
      Ticket findTicketByCode(int code);
-     boolean addTicket(Ticket ticket);
-     boolean updateTicket(Ticket ticket);
+     Ticket createTicket(Integer userId, Integer eventId, Integer quantity);
+     boolean setTicketUsed(Integer ticketId);
      boolean deleteTicket(int id);     
  }

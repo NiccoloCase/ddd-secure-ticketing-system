@@ -6,8 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
-import org.swe.core.dbManager.DBManager;
+import org.swe.core.DBM.DBManager;
 import org.swe.model.User;
 
 //i campi sono degli esempi andranno quasi certamente modificati con quelli reali 
@@ -67,12 +66,14 @@ public class ConcreteUserDAO implements UserDAO {
      }
 
      @Override
-     public boolean addUser(User guest) {
+     public boolean addUser(User user) {
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("INSERT INTO guests (name, email) VALUES (?, ?)");
-               statement.setString(1, guest.getName());
-               statement.setString(2, guest.getEmail());
+               PreparedStatement statement = connection.prepareStatement("INSERT INTO AppUser (name, surname, password_hash, email) VALUES (?, ?, ?, ?)");
+               statement.setString(1, user.getName());
+                statement.setString(2, user.getSurname());
+                statement.setString(3, user.getPasswordHash());
+                statement.setString(4, user.getEmail());
                statement.executeUpdate();
                return true;
           } catch (SQLException e) {

@@ -79,7 +79,6 @@ public class ConcreteEventDAO implements EventDAO {
                               .setTicketsAvailable(resultSet.getInt("tickets_available"))
                               .setTicketPrice(resultSet.getDouble("ticket_price"))
                               .build();
-
                     events.add(event);
                }
                resultSet.close();
@@ -155,6 +154,27 @@ public class ConcreteEventDAO implements EventDAO {
      }
 
      @Override
+     public boolean isUserAdminOfEvent(int userId, int eventId) {
+          try {
+               Connection connection = dbManager.getConnection();
+               PreparedStatement statement = connection.prepareStatement(
+                         "SELECT * FROM Admin WHERE user_id = ? AND event_id = ?");
+               statement.setInt(1, userId);
+               statement.setInt(2, eventId);
+
+               ResultSet rs = statement.executeQuery();
+               boolean isAdmin = rs.next();
+               rs.close();
+               statement.close();
+               return isAdmin;
+
+          } catch (SQLException e) {
+               e.printStackTrace();
+          }
+          return false;
+     }
+
+     @Override
      public boolean deleteEvent(int id) {
           try {
                Connection connection = dbManager.getConnection();
@@ -171,26 +191,4 @@ public class ConcreteEventDAO implements EventDAO {
           }
           return false;
      }
-
-     @Override
-     public boolean isUserAdminOfEvent(int userId, int eventId) {
-          try {
-              Connection conn = dbManager.getConnection();
-              PreparedStatement stmt = conn.prepareStatement(
-                  "SELECT 1 FROM Admin WHERE user_id = ? AND event_id = ?"
-              );
-              stmt.setInt(1, userId);
-              stmt.setInt(2, eventId);
-      
-              ResultSet rs = stmt.executeQuery();
-              boolean exists = rs.next();
-              rs.close();
-              stmt.close();
-              return exists;
-      
-          } catch (SQLException e) {
-              e.printStackTrace();
-          }
-          return false;
-      }
 }

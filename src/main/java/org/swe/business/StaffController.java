@@ -16,6 +16,8 @@ public class StaffController extends UserController {
     }
 
     public String startVerificationSession(StartVerificationSessionDTO payload) {
+        validationInterceptor(payload);
+
         VerifySession verifySession = new VerifySession(
                 12, // TODO replace with actual staff id
                 payload.getEventId(),
@@ -25,6 +27,7 @@ public class StaffController extends UserController {
     }
 
     public void getVerificationSessionResult(GetVerificationSessionResultDTO payload) throws BadRequestException {
+        validationInterceptor(payload);
 
         // Auth
         // TODO

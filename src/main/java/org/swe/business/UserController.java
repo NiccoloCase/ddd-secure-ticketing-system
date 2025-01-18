@@ -45,8 +45,6 @@ public class UserController {
         }
     }
 
-
-
     protected User authInterceptor(String token) {
         Claims claims = JWTUtility.validateToken(token);
         if (claims == null) {

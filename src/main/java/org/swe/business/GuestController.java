@@ -23,9 +23,9 @@ import org.swe.model.VerifySession;
 import io.jsonwebtoken.Claims;
 
 public class GuestController extends UserController {
-    private VerifySessionService verifySessionService;
-    private EventDAO eventDAO;
-    private TicketDAO ticketDAO;
+    private final VerifySessionService verifySessionService;
+    private final EventDAO eventDAO;
+    private final TicketDAO ticketDAO;
     private UserDAO userDAO;
 
     public GuestController(AuthService authHandler, VerifySessionService verifySessionService, EventDAO eventDAO,
@@ -38,6 +38,7 @@ public class GuestController extends UserController {
     }
 
     public Ticket buyTicket(BuyTicketDTO dto, String token) {
+        validationInterceptor(dto);
 
         User user = authInterceptor(token);
 
@@ -86,6 +87,8 @@ public class GuestController extends UserController {
     }
 
     public boolean scanStaffVerificationCodeDTO(ScanStaffVerificationCodeDTO dto, String token) {
+        validationInterceptor(dto);
+
         User user = authInterceptor(token);
 
         String code = dto.getCode();

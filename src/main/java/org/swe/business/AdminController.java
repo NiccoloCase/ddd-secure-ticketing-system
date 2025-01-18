@@ -27,7 +27,7 @@ public class AdminController extends UserController {
 
     public boolean createEvent(CreateEventDTO dto, String token) {
 
-        User user = validateInterceptor(token);
+        User user = authInterceptor(token);
 
         // TODO: Forse levare? guest e staff possono creare eventi?
         if (!(user instanceof Admin)) {
@@ -46,7 +46,7 @@ public class AdminController extends UserController {
     }
 
     public boolean deleteEvent(int eventId, String token) {
-        User user = validateInterceptor(token);
+        User user = authInterceptor(token);
         if (!(user instanceof Admin)) {
             throw new UnauthorizedException("Not authorized. Must be admin.");
         }
@@ -54,7 +54,7 @@ public class AdminController extends UserController {
     }
 
     public boolean updateEvent(UpdateEventDTO dto, String token) {
-        User user = validateInterceptor(token);
+        User user = authInterceptor(token);
         if (!(user instanceof Admin)) {
             throw new UnauthorizedException("Not authorized. Must be admin.");
         }
@@ -72,7 +72,7 @@ public class AdminController extends UserController {
     }
 
     public List<Event> getAllEvents(String token) {
-        User user = validateInterceptor(token);
+        User user = authInterceptor(token);
 
         if (!(user instanceof Admin)) {
             throw new UnauthorizedException("Not authorized. Must be admin.");
@@ -85,7 +85,7 @@ public class AdminController extends UserController {
 
     public void addStaff(AddStaffToEventDTO dto, String token) {
 
-        User user = validateInterceptor(token);
+        User user = authInterceptor(token);
 
         if (!(user instanceof Admin)) {
             throw new UnauthorizedException("Not authorized. Must be admin.");
@@ -104,7 +104,7 @@ public class AdminController extends UserController {
     }
 
     public void removeStaff(RemoveStaffFromEventDTO dto, String token) {
-        User user = validateInterceptor(token);
+        User user = authInterceptor(token);
 
         if (!(user instanceof Admin)) {
             throw new UnauthorizedException("Not authorized. Must be admin.");

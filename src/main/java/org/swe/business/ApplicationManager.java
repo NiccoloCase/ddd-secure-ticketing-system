@@ -9,13 +9,17 @@ public final class ApplicationManager {
 
     private final AuthService authService;
     private final VerifySessionService verifySessionService;
-    private final EventDAO eventDAO = new ConcreteEventDAO();
-    private final UserDAO userDAO = new ConcreteUserDAO();
+    private final EventDAO eventDAO;
+    private final UserDAO userDAO;
     private GuestController guestController = null;
     private StaffController staffController = null;
     private AdminController adminController = null;
 
     public ApplicationManager() {
+        // DAOs
+        eventDAO = new ConcreteEventDAO();
+        userDAO = new ConcreteUserDAO();
+        // services
         authService = new AuthServiceImpl();
         verifySessionService = new VerifySessionServiceImpl();
     }
@@ -40,5 +44,4 @@ public final class ApplicationManager {
         }
         return adminController;
     }
-
 }

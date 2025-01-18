@@ -10,9 +10,8 @@ import java.util.ArrayList;
 import org.swe.core.DBM.DBManager;
 import org.swe.model.User;
 
-//i campi sono degli esempi andranno quasi certamente modificati con quelli reali 
-
 public class ConcreteUserDAO implements UserDAO {
+
      private DBManager dbManager;
 
      public ConcreteUserDAO() {
@@ -20,78 +19,132 @@ public class ConcreteUserDAO implements UserDAO {
      }
 
      @Override
-     public User getUser(int id) {
+     public User getUserById(int id) {
+          User user = null;
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("SELECT * FROM guests WHERE id = ?");
+               PreparedStatement statement = connection.prepareStatement(
+                         "SELECT * FROM guests WHERE id = ?");
                statement.setInt(1, id);
-               ResultSet resultSet = statement.executeQuery();
-               if (resultSet.next()) {
-                    return new User(resultSet.getString("name"), resultSet.getString("surname"), resultSet.getString("passwordHash"), resultSet.getString("email"), resultSet.getInt("id"));
+
+               ResultSet rs = statement.executeQuery();
+               if (rs.next()) {
+                    user = new User(
+                              rs.getString("name"),
+                              rs.getString("surname"),
+                              rs.getString("passwordHash"),
+                              rs.getString("email"),
+                              rs.getInt("id"));
                }
+               rs.close();
+               statement.close();
+
           } catch (SQLException e) {
                e.printStackTrace();
           }
-          return null;
+          return user;
      }
 
      @Override
      public ArrayList<User> getAllUsers() {
-          ArrayList<User> guests = new ArrayList<>();
+          ArrayList<User> users = new ArrayList<>();
           try {
                Connection connection = dbManager.getConnection();
                Statement statement = connection.createStatement();
-               ResultSet resultSet = statement.executeQuery("SELECT * FROM guests");
-               while (resultSet.next()) {
-                    guests.add(new User(resultSet.getString("name"), resultSet.getString("surname"), resultSet.getString("passwordHash"), resultSet.getString("email"), resultSet.getInt("id")));
+               ResultSet rs = statement.executeQuery("SELECT * FROM guests");
+
+               while (rs.next()) {
+                    User user = new User(
+                              rs.getString("name"),
+                              rs.getString("surname"),
+                              rs.getString("passwordHash"),
+                              rs.getString("email"),
+                              rs.getInt("id"));
+                    users.add(user);
                }
+               rs.close();
+               statement.close();
+
           } catch (SQLException e) {
                e.printStackTrace();
           }
-          return guests;
+          return users;
      }
 
      @Override
-     public User findUserByEmail(String email) {
+     public User getUserByEmail(String email) {
+          User user = null;
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("SELECT * FROM guests WHERE email = ?");
+               PreparedStatement statement = connection.prepareStatement(
+                         "SELECT * FROM guests WHERE email = ?");
                statement.setString(1, email);
-               ResultSet resultSet = statement.executeQuery();
-               if (resultSet.next()) {
-                    return new User(resultSet.getString("name"), resultSet.getString("surname"), resultSet.getString("passwordHash"), resultSet.getString("email"), resultSet.getInt("id"));
+
+               ResultSet rs = statement.executeQuery();
+               if (rs.next()) {
+                    user = new User(
+                              rs.getString("name"),
+                              rs.getString("surname"),
+                              rs.getString("passwordHash"),
+                              rs.getString("email"),
+                              rs.getInt("id"));
                }
+               rs.close();
+               statement.close();
+
           } catch (SQLException e) {
                e.printStackTrace();
           }
-          return null;
+          return user;
      }
 
      @Override
-     public boolean addUser(User guest) {
+     public User createUser(String name, String surname, String passwordHash, String email) {
+          User newUser = null;
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("INSERT INTO guests (name, email) VALUES (?, ?)");
-               statement.setString(1, guest.getName());
-               statement.setString(2, guest.getEmail());
-               statement.executeUpdate();
-               return true;
+
+               PreparedStatement statement = connection.prepareStatement(
+                         "INSERT INTO guests (name, surname, passwordHash, email) VALUES (?, ?, ?, ?)",
+                         Statement.RETURN_GENERATED_KEYS);
+               statement.setString(1, name);
+               statement.setString(2, surname);
+               statement.setString(3, passwordHash);
+               statement.setString(4, email);
+
+               int rowsInserted = statement.executeUpdate();
+               if (rowsInserted > 0) {
+                    try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                         if (generatedKeys.next()) {
+                              int newId = generatedKeys.getInt(1);
+                              newUser = new User(name, surname, passwordHash, email, newId);
+                         }
+                    }
+               }
+               statement.close();
+
           } catch (SQLException e) {
                e.printStackTrace();
           }
-          return false;
+          return newUser;
      }
 
      @Override
-     public boolean updateUser(User guest) {
+     public boolean updateUser(int id, String name, String surname, String passwordHash, String email) {
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("UPDATE guests SET name = ?, email = ? WHERE id = ?");
-               statement.setString(1, guest.getName());
-               statement.setString(2, guest.getEmail());
-               statement.setInt(3, guest.getId());
-               statement.executeUpdate();
-               return true;
+               PreparedStatement statement = connection.prepareStatement(
+                         "UPDATE guests SET name = ?, surname = ?, passwordHash = ?, email = ? WHERE id = ?");
+               statement.setString(1, name);
+               statement.setString(2, surname);
+               statement.setString(3, passwordHash);
+               statement.setString(4, email);
+               statement.setInt(5, id);
+
+               int rowsUpdated = statement.executeUpdate();
+               statement.close();
+               return (rowsUpdated > 0);
+
           } catch (SQLException e) {
                e.printStackTrace();
           }
@@ -102,14 +155,17 @@ public class ConcreteUserDAO implements UserDAO {
      public boolean deleteUser(int id) {
           try {
                Connection connection = dbManager.getConnection();
-               PreparedStatement statement = connection.prepareStatement("DELETE FROM guests WHERE id = ?");
+               PreparedStatement statement = connection.prepareStatement(
+                         "DELETE FROM guests WHERE id = ?");
                statement.setInt(1, id);
-               statement.executeUpdate();
-               return true;
+
+               int rowsDeleted = statement.executeUpdate();
+               statement.close();
+               return (rowsDeleted > 0);
+
           } catch (SQLException e) {
                e.printStackTrace();
           }
           return false;
      }
-     
 }

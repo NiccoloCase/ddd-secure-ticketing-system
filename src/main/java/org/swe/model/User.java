@@ -1,5 +1,7 @@
 package org.swe.model;
 
+import org.swe.core.utils.PasswordUtility;
+
 public class User {
     private String name;
     private String surname;
@@ -53,5 +55,9 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean isPasswordCorrect(String password) {
+        return PasswordUtility.checkPassword(password, passwordHash);
     }
 }

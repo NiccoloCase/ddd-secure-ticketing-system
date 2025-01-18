@@ -2,7 +2,7 @@ package org.swe;
 
 import org.swe.core.Config;
 import org.swe.core.DAO.*;
-import org.swe.core.dbManager.DBManager;
+import org.swe.core.DBM.DBManager;
 import org.swe.model.*;
 
 
@@ -75,6 +75,6 @@ public class Main {
             eventDAO.deleteEvent(i+1);
         }
 
-        DBManager.close();
+        dbManager.close();
     }
 }

@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import org.swe.core.dbManager.DBManager;
+import org.swe.core.DBM.DBManager;
 import org.swe.model.Event;
 
 public class ConcreteEventDAO implements EventDAO {

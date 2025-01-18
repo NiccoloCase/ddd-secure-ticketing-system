@@ -106,6 +106,26 @@ public class ConcreteTicketDAO implements TicketDAO {
           }
           return false;
      }
+
+     @Override
+     public ArrayList<Ticket> getTicketsByUserAndEvent(Integer userId, Integer eventId) {
+          ArrayList<Ticket> tickets = new ArrayList<>();
+          try {
+               Connection connection = dbManager.getConnection();
+               PreparedStatement statement = connection.prepareStatement("SELECT * FROM Ticket WHERE user_id = ? AND event_id = ?");
+               statement.setInt(1, userId);
+               statement.setInt(2, eventId);
+               ResultSet resultSet = statement.executeQuery();
+               while (resultSet.next()) {
+                    tickets.add(new Ticket(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("event_id"), resultSet.getInt("quantity"), resultSet.getBoolean("used")));
+               }
+               statement.close();
+               return tickets;
+          } catch (SQLException e) {
+               e.printStackTrace();
+          }
+          return null;
+     }
 }
 
 

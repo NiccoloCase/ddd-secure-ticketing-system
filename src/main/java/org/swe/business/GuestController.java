@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.swe.core.DAO.EventDAO;
 import org.swe.core.DAO.TicketDAO;
-import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.BuyTicketDTO;
 import org.swe.core.DTO.ScanStaffVerificationCodeDTO;
 import org.swe.core.exceptions.BadRequestException;
@@ -26,15 +25,13 @@ public class GuestController extends UserController {
     private VerifySessionService verifySessionService;
     private EventDAO eventDAO;
     private TicketDAO ticketDAO;
-    private UserDAO userDAO;
 
     public GuestController(AuthService authHandler, VerifySessionService verifySessionService, EventDAO eventDAO,
-            TicketDAO ticketDAO, UserDAO userDAO) {
+            TicketDAO ticketDAO) {
         super(authHandler);
         this.verifySessionService = verifySessionService;
         this.eventDAO = eventDAO;
         this.ticketDAO = ticketDAO;
-        this.userDAO = userDAO;
     }
 
     public Ticket buyTicket(BuyTicketDTO dto, String token) {

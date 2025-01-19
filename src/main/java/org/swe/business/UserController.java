@@ -46,18 +46,10 @@ public class UserController {
     }
 
     protected User authInterceptor(String token) {
-        Claims claims = JWTUtility.validateToken(token);
-        if (claims == null) {
-            throw new UnauthorizedException("Token is invalid or expired");
-        }
-        Integer userId = claims.get("userId", Integer.class);
-        if (userId == null) {
-            throw new UnauthorizedException("userId is invalid.");
-        }
+        Integer userId = authService.validateAccessToken(token);
+        if (userId == null) throw new UnauthorizedException("userId is invalid.");
         User user = userDAO.getUserById(userId);
-        if (user == null) {
-            throw new UnauthorizedException("User not found.");
-        }
+        if (user == null) throw new UnauthorizedException("User not found.");
         return user;
     }
 

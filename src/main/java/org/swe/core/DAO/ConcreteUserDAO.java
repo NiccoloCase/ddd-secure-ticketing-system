@@ -24,7 +24,7 @@ public class ConcreteUserDAO implements UserDAO {
           try {
                Connection connection = dbManager.getConnection();
                PreparedStatement statement = connection.prepareStatement(
-                         "SELECT * FROM guests WHERE id = ?");
+                         "SELECT * FROM appuser WHERE id = ?");
                statement.setInt(1, id);
 
                ResultSet rs = statement.executeQuery();
@@ -32,7 +32,7 @@ public class ConcreteUserDAO implements UserDAO {
                     user = new User(
                               rs.getString("name"),
                               rs.getString("surname"),
-                              rs.getString("passwordHash"),
+                              rs.getString("password_hash"),
                               rs.getString("email"),
                               rs.getInt("id"));
                }
@@ -51,13 +51,13 @@ public class ConcreteUserDAO implements UserDAO {
           try {
                Connection connection = dbManager.getConnection();
                Statement statement = connection.createStatement();
-               ResultSet rs = statement.executeQuery("SELECT * FROM guests");
+               ResultSet rs = statement.executeQuery("SELECT * FROM appuser");
 
                while (rs.next()) {
                     User user = new User(
                               rs.getString("name"),
                               rs.getString("surname"),
-                              rs.getString("passwordHash"),
+                              rs.getString("password_hash"),
                               rs.getString("email"),
                               rs.getInt("id"));
                     users.add(user);
@@ -77,7 +77,7 @@ public class ConcreteUserDAO implements UserDAO {
           try {
                Connection connection = dbManager.getConnection();
                PreparedStatement statement = connection.prepareStatement(
-                         "SELECT * FROM guests WHERE email = ?");
+                         "SELECT * FROM appuser WHERE email = ?");
                statement.setString(1, email);
 
                ResultSet rs = statement.executeQuery();
@@ -85,7 +85,7 @@ public class ConcreteUserDAO implements UserDAO {
                     user = new User(
                               rs.getString("name"),
                               rs.getString("surname"),
-                              rs.getString("passwordHash"),
+                              rs.getString("password_hash"),
                               rs.getString("email"),
                               rs.getInt("id"));
                }
@@ -107,7 +107,7 @@ public class ConcreteUserDAO implements UserDAO {
                Connection connection = dbManager.getConnection();
 
                PreparedStatement statement = connection.prepareStatement(
-                         "INSERT INTO guests (name, surname, passwordHash, email) VALUES (?, ?, ?, ?)",
+                         "INSERT INTO appuser (name, surname, password_hash, email) VALUES (?, ?, ?, ?)",
                          Statement.RETURN_GENERATED_KEYS);
                statement.setString(1, name);
                statement.setString(2, surname);
@@ -136,7 +136,7 @@ public class ConcreteUserDAO implements UserDAO {
           try {
                Connection connection = dbManager.getConnection();
                PreparedStatement statement = connection.prepareStatement(
-                         "UPDATE guests SET name = ?, surname = ?, passwordHash = ?, email = ? WHERE id = ?");
+                         "UPDATE appuser SET name = ?, surname = ?, password_hash = ?, email = ? WHERE id = ?");
                statement.setString(1, name);
                statement.setString(2, surname);
                statement.setString(3, passwordHash);
@@ -158,7 +158,7 @@ public class ConcreteUserDAO implements UserDAO {
           try {
                Connection connection = dbManager.getConnection();
                PreparedStatement statement = connection.prepareStatement(
-                         "DELETE FROM guests WHERE id = ?");
+                         "DELETE FROM appuser WHERE id = ?");
                statement.setInt(1, id);
 
                int rowsDeleted = statement.executeUpdate();

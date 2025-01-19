@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class JWTUtilityTest {
     @BeforeAll
     static void setUp() {
-        Config.init();
     }
 
 

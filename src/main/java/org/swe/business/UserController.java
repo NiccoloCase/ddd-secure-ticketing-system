@@ -23,6 +23,12 @@ public class UserController {
         this.userDAO = userDAO;
     }
 
+
+    public String whoami(String token) {
+        User user = authInterceptor(token);
+        return user.getName() + " " + user.getSurname();
+    }
+
     public String login(LoginDTO dto) {
         validationInterceptor(dto);
 
@@ -38,9 +44,13 @@ public class UserController {
         validationInterceptor(dto);
         try {
             User newUser = userDAO.createUser(dto.getName(), dto.getSurname(), dto.getPassword(), dto.getEmail());
+            if(newUser == null){
+                throw new BadRequestException("User already exists");
+            }
             return authService.generateAccessToken(newUser);
         }
         catch (Exception e) {
+            System.out.println(e);
             throw new BadRequestException("User already exists");
         }
     }

@@ -18,12 +18,14 @@ import io.jsonwebtoken.security.SecurityException;
 
 public class JWTUtility {
     private static final long expirationTime = 3600000; // 1 hour
-    private static final SecretKey secretKey = Keys.hmacShaKeyFor(Config.JWT_SECRET.getBytes());
 
     /**
      * Generate a JWT token
      */
     public static String generateToken(Map<String, Object> claims) {
+
+        SecretKey secretKey = Keys.hmacShaKeyFor(Config.JWT_SECRET.getBytes());
+
         return Jwts.builder()
                 .claims(claims)
                 .issuedAt(new Date())
@@ -39,6 +41,8 @@ public class JWTUtility {
      * - the claims if the token is valid
      */
     public static Claims validateToken(String token) {
+        SecretKey secretKey = Keys.hmacShaKeyFor(Config.JWT_SECRET.getBytes());
+
         try {
             JwtParser parser = Jwts.parser()
                     .verifyWith(secretKey)

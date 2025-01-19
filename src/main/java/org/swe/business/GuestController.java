@@ -10,12 +10,10 @@ import org.swe.core.DTO.ScanStaffVerificationCodeDTO;
 import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.utils.JWTUtility;
-import org.swe.model.ApplePayPayment;
-import org.swe.model.CreditCardPayment;
 import org.swe.model.Event;
-import org.swe.model.GooglePayPayment;
 import org.swe.model.PaymentContext;
 import org.swe.model.PaymentStrategy;
+import org.swe.model.PaymentStrategyFactory;
 import org.swe.model.Ticket;
 import org.swe.model.User;
 import org.swe.model.VerifySession;
@@ -50,16 +48,12 @@ public class GuestController extends UserController {
         if (available < dto.getQuantity()) {
             throw new BadRequestException("Not enough tickets available.");
         }
-
         PaymentContext paymentContext = new PaymentContext();
-        PaymentStrategy paymentStrategy = switch (dto.getPaymentMethod()) {
-            case GOOGLE_PAY -> new GooglePayPayment();
-            case CREDIT_CARD -> new CreditCardPayment();
-            case APPLE_PAY -> new ApplePayPayment();
-            default -> throw new BadRequestException("Unsupported payment method.");
-        };
+
+        PaymentStrategy paymentStrategy = PaymentStrategyFactory.getPaymentStrategy(dto.getPaymentMethod());
 
         paymentContext.setPaymentStrategy(paymentStrategy);
+
         boolean paymentSuccess = paymentContext.executePayment(event.getTicketPrice() * dto.getQuantity());
 
         if (!paymentSuccess) {

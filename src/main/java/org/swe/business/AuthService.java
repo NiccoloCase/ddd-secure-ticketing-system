@@ -8,5 +8,5 @@ import io.jsonwebtoken.Claims;
 public interface AuthService {
     String authenticateWithPassword(User user, String password) throws UnauthorizedException;
     String generateAccessToken(User user);
-    Claims validateAccessToken(String token);
+    Integer validateAccessToken(String token);
 }

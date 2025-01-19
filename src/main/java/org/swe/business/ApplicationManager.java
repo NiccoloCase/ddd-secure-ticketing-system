@@ -32,8 +32,8 @@ public final class ApplicationManager {
         adminDAO = new ConcreteAdminDAO();
         staffDAO = new ConcreteStaffDAO();
         // services
-        authService = new AuthServiceImpl();
-        verifySessionService = new VerifySessionServiceImpl();
+        authService = new ConcreteAuthService();
+        verifySessionService = new ConcreteVerifySessionService();
     }
 
     public GuestController getGuestController() {

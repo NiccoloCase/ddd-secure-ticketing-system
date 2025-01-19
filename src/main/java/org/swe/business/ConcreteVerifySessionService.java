@@ -10,7 +10,7 @@ import org.swe.core.utils.JWTUtility;
 import org.swe.model.VerifySession;
 import org.swe.model.VerifySessionStatus;
 
-public class VerifySessionServiceImpl implements VerifySessionService {
+public class ConcreteVerifySessionService implements VerifySessionService {
     private final Map<String, VerifySession> sessionData = new HashMap<>();
 
     @Override

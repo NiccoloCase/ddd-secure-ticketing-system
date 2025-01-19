@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class VerifySessionServiceImplTest {
 
-    private VerifySessionServiceImpl service;
+    private ConcreteVerifySessionService service;
 
     @BeforeEach
     void setUp() {
-        service = new VerifySessionServiceImpl();
+        service = new ConcreteVerifySessionService();
     }
 
     @Test

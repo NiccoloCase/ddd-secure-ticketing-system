@@ -4,6 +4,7 @@ import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.GetVerificationSessionResultDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
+import org.swe.model.User;
 import org.swe.model.VerifySession;
 
 public class StaffController extends UserController {
@@ -15,41 +16,42 @@ public class StaffController extends UserController {
         this.verifySessionService = verifySessionService;
     }
 
-    public String startVerificationSession(StartVerificationSessionDTO payload) {
+    public String startVerificationSession(StartVerificationSessionDTO payload, String token) {
         validationInterceptor(payload);
+        User user = authInterceptor(token);
 
         VerifySession verifySession = new VerifySession(
-                12, // TODO replace with actual staff id
+                user.getId(),
                 payload.getEventId(),
                 null
         );
         return verifySessionService.addToSession(verifySession);
     }
 
-    public void getVerificationSessionResult(GetVerificationSessionResultDTO payload) throws BadRequestException {
+    public void getVerificationSessionResult(GetVerificationSessionResultDTO payload, String token) throws BadRequestException {
         validationInterceptor(payload);
-
-        // Auth
-        // TODO
-
-        // Get the session from the session key if it exists
+        User user = authInterceptor(token);
         VerifySession verifySession;
-        try {
-
+        
+        // Get the session from the session key if it exists
+        try{
             verifySession = verifySessionService.getFromSession(payload.getSessionKey());
+        } catch (Exception e) {
+            throw new BadRequestException("Session does not exist");
         }
-        catch (Exception e) {
-            throw new BadRequestException("Invalid session key");
-        }
+        
 
         // Check if the session is for the current staff member
-        // TODO
+        if(verifySession.getStaffId() != user.getId()){
+            throw new BadRequestException("Session does not belong to the current staff member");
+        }
 
         // If the session is still pending or does not have a ticket id, return a message
         // TODO
 
         // Check if the session has an TICKET ID registered and fetch the ticket
         // TODO
+        
 
         // Check if the ticket is valid
         // TODO

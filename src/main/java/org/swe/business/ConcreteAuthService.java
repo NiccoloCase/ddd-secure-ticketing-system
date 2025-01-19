@@ -9,9 +9,9 @@ import org.swe.model.User;
 
 import io.jsonwebtoken.Claims;
 
-public class AuthServiceImpl implements AuthService {
+public class ConcreteAuthService implements AuthService {
 
-    public AuthServiceImpl() {
+    public ConcreteAuthService() {
     }
 
     /**

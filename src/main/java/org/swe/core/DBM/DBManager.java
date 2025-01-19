@@ -2,10 +2,7 @@ package org.swe.core.DBM;
 
 import org.swe.Config;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
+import java.sql.*;
 
 
 public class DBManager {
@@ -14,7 +11,6 @@ public class DBManager {
      private Connection connection = null;
 
      private DBManager() {
-          Config.init();
            try {
                this.connection = DriverManager.getConnection(Config.DB_URL);
                System.out.println("Connection established");
@@ -50,5 +46,34 @@ public class DBManager {
                 e.printStackTrace();
            }
      }
+
+    public void clearTables() {
+        String[] tables = {"appuser", "event", "staff", "ticket", "admin"};
+
+        try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false); // Begin transaction.
+
+            for (String table : tables) {
+                statement.executeUpdate("DELETE FROM " + table);
+            }
+            connection.commit();
+            System.out.println("All tables cleared successfully.");
+        } catch (SQLException e) {
+            try {
+                connection.rollback(); // Rollback in case of error.
+            } catch (SQLException rollbackEx) {
+                System.err.println("Rollback failed: " + rollbackEx.getMessage());
+            }
+            System.err.println("Failed to clear tables: " + e.getMessage());
+        } finally {
+            try {
+                connection.setAutoCommit(true); // Restore default auto-commit mode.
+            } catch (SQLException ex) {
+                System.err.println("Failed to restore auto-commit mode: " + ex.getMessage());
+            }
+        }
+    }
+
+
 
 }

@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import org.swe.core.DBM.DBManager;
-import org.swe.core.utils.PasswordUtility;
 import org.swe.model.User;
 
 public class ConcreteUserDAO implements UserDAO {

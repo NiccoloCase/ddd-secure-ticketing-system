@@ -1,8 +1,9 @@
 package org.swe.business;
 
-import io.jsonwebtoken.Claims;
 import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.model.User;
+
+import io.jsonwebtoken.Claims;
 
 public interface AuthService {
     String authenticateWithPassword(User user, String password) throws UnauthorizedException;

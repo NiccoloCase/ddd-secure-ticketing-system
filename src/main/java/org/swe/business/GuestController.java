@@ -26,7 +26,6 @@ public class GuestController extends UserController {
     private final VerifySessionService verifySessionService;
     private final EventDAO eventDAO;
     private final TicketDAO ticketDAO;
-    private UserDAO userDAO;
 
     public GuestController(AuthService authHandler, VerifySessionService verifySessionService, EventDAO eventDAO,
             TicketDAO ticketDAO, UserDAO userDAO) {
@@ -34,7 +33,7 @@ public class GuestController extends UserController {
         this.verifySessionService = verifySessionService;
         this.eventDAO = eventDAO;
         this.ticketDAO = ticketDAO;
-        this.userDAO = userDAO;
+
     }
 
     public Ticket buyTicket(BuyTicketDTO dto, String token) {
@@ -53,7 +52,7 @@ public class GuestController extends UserController {
         }
 
         PaymentContext paymentContext = new PaymentContext();
-        PaymentStrategy paymentStrategy = switch (dto.getPaymentMethod()) { 
+        PaymentStrategy paymentStrategy = switch (dto.getPaymentMethod()) {
             case GOOGLE_PAY -> new GooglePayPayment();
             case CREDIT_CARD -> new CreditCardPayment();
             case APPLE_PAY -> new ApplePayPayment();

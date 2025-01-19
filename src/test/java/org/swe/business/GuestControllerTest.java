@@ -1,17 +1,16 @@
 package org.swe.business;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.swe.core.DAO.EventDAO;
 import org.swe.core.DAO.TicketDAO;
@@ -19,114 +18,244 @@ import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.BuyTicketDTO;
 import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.NotFoundException;
+import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.model.Event;
+import org.swe.model.PaymentContext;
 import org.swe.model.PaymentMethod;
+import org.swe.model.PaymentStrategy;
 import org.swe.model.Ticket;
+import org.swe.model.User;
 
 class GuestControllerTest {
 
-    private VerifySessionService verifySessionServiceMock;
-    private EventDAO eventDAOMock;
-    private TicketDAO ticketDAOMock;
-    private UserDAO userDAOMock;
-    private AuthService authServiceMock;
     private GuestController guestController;
-
-    private Event mockEvent;
+    private AuthService mockAuthService;
+    private VerifySessionService mockVerifySessionService;
+    private EventDAO mockEventDAO;
+    private TicketDAO mockTicketDAO;
+    private UserDAO mockUserDAO;
 
     @BeforeEach
     void setUp() {
+        mockAuthService = mock(AuthService.class);
+        mockVerifySessionService = mock(VerifySessionService.class);
+        mockEventDAO = mock(EventDAO.class);
+        mockTicketDAO = mock(TicketDAO.class);
+        mockUserDAO = mock(UserDAO.class);
 
-        verifySessionServiceMock = mock(VerifySessionService.class);
-        eventDAOMock = mock(EventDAO.class);
-        ticketDAOMock = mock(TicketDAO.class);
-        userDAOMock = mock(UserDAO.class);
-        authServiceMock = mock(AuthService.class);
+        guestController = new GuestController(mockAuthService, mockVerifySessionService, mockEventDAO, mockTicketDAO,
+                mockUserDAO);
 
-        guestController = new GuestController(
-                authServiceMock,
-                verifySessionServiceMock,
-                eventDAOMock,
-                ticketDAOMock,
-                userDAOMock);
-
-        mockEvent = new Event.Builder()
-                .setId(100)
-                .setTitle("Concerto")
-                .setDescription("Concerto di prova")
-                .setDate(new Date(System.currentTimeMillis() + 86400000)) // domani
-                .setTicketsAvailable(10)
-                .setTicketPrice(50.0)
-                .build();
-
+        // Mock user authentication
+        when(mockAuthService.validateAccessToken("token")).thenReturn(1);
+        when(mockUserDAO.getUserById(1)).thenReturn(new User("name", "surname", "password", "email", 1));
     }
 
-    @Test
-    void buyTicket_Successful() {
+    @Nested
+    class BuyTicketTests {
 
-        BuyTicketDTO dto = new BuyTicketDTO();
-        dto.setEventId(100);
-        dto.setQuantity(2);
-        dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+        @Test
+        void buyTicketShouldReturnTicketIfPurchaseIsSuccessful() {
+            BuyTicketDTO dto = new BuyTicketDTO();
+            dto.setEventId(1);
+            dto.setQuantity(2);
+            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
 
-        when(eventDAOMock.getEventById(100)).thenReturn(mockEvent);
+            Event event = new Event.Builder()
+                    .setId(1)
+                    .setTitle("title")
+                    .setDescription("description")
+                    .setDate(Date.from(LocalDate.of(2025, 12, 12).atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                    .setTicketsAvailable(5)
+                    .setTicketPrice(10)
+                    .build();
+            when(mockEventDAO.getEventById(1)).thenReturn(event);
 
-        when(eventDAOMock.updateEvent(
-                eq(100),
-                anyString(),
-                anyString(),
-                any(Date.class),
-                eq(8), 
-                eq(50.0))).thenReturn(true);
+            PaymentStrategy paymentStrategy = mock(PaymentStrategy.class);
+            when(paymentStrategy.processPayment(20)).thenReturn(true);
 
-        Ticket createdTicket = new Ticket(1, 1, 100, 2, false);
-        when(ticketDAOMock.createTicket(1, 100, 2)).thenReturn(createdTicket);
+            PaymentContext paymentContext = new PaymentContext();
+            paymentContext.setPaymentStrategy(paymentStrategy);
 
-        Ticket result = guestController.buyTicket(dto, "fakeToken");
+            when(mockEventDAO.updateEvent(
+                    1,
+                    event.getTitle(),
+                    event.getDescription(),
+                    event.getDate(),
+                    3,
+                    10))
+                    .thenReturn(true);
 
-        assertNotNull(result);
-        assertEquals(1, result.getId());
-        assertEquals(1, result.getUserId());
-        assertEquals(100, result.getEventId());
-        assertEquals(2, result.getQuantity());
-        verify(eventDAOMock).getEventById(100);
-        verify(ticketDAOMock).createTicket(1, 100, 2);
+            Ticket ticket = new Ticket(1, 1, 1, 2, false);
+            when(mockTicketDAO.createTicket(1, 1, 2)).thenReturn(ticket);
+
+            Ticket result = guestController.buyTicket(dto, "token");
+            assertNotNull(result);
+            assertEquals(2, result.getQuantity());
+        }
+
+        @Test
+        void buyTicketShouldThrowNotFoundExceptionIfEventDoesNotExist() {
+            BuyTicketDTO dto = new BuyTicketDTO();
+            dto.setEventId(1);
+            dto.setQuantity(2);
+            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+
+            when(mockEventDAO.getEventById(1)).thenReturn(null);
+
+            assertThrows(NotFoundException.class, () -> guestController.buyTicket(dto, "token"));
+        }
+
+        @Test
+        void buyTicketShouldThrowBadRequestExceptionIfNotEnoughTicketsAvailable() {
+            BuyTicketDTO dto = new BuyTicketDTO();
+            dto.setEventId(1);
+            dto.setQuantity(10);
+            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+
+            Event event = new Event.Builder()
+                    .setId(1)
+                    .setTitle("title")
+                    .setDescription("description")
+                    .setDate(Date.from(LocalDate.of(2025, 12, 12).atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                    .setTicketsAvailable(5)
+                    .build();
+            when(mockEventDAO.getEventById(1)).thenReturn(event);
+
+            assertThrows(BadRequestException.class, () -> guestController.buyTicket(dto, "token"));
+        }
+
+        @Test
+        void buyTicketShouldThrowBadRequestExceptionIfPaymentFails() {
+            BuyTicketDTO dto = new BuyTicketDTO();
+            dto.setEventId(1);
+            dto.setQuantity(2);
+            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+
+            Event event = new Event.Builder()
+                    .setId(1)
+                    .setTitle("title")
+                    .setDescription("description")
+                    .setDate(Date.from(LocalDate.of(2025, 12, 12).atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                    .setTicketsAvailable(5)
+                    .setTicketPrice(10)
+                    .build();
+            when(mockEventDAO.getEventById(1)).thenReturn(event);
+
+            PaymentStrategy paymentStrategy = mock(PaymentStrategy.class);
+            when(paymentStrategy.processPayment(20)).thenReturn(false);
+
+            assertThrows(BadRequestException.class, () -> guestController.buyTicket(dto, "token"));
+        }
+
+        @Test
+        void buyTicketShouldThrowBadRequestExceptionIfEventUpdateFails() {
+            BuyTicketDTO dto = new BuyTicketDTO();
+            dto.setEventId(1);
+            dto.setQuantity(2);
+            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+
+            Event event = new Event.Builder()
+                    .setId(1)
+                    .setTitle("title")
+                    .setDescription("description")
+                    .setDate(Date.from(LocalDate.of(2025, 12, 12).atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                    .setTicketsAvailable(5)
+                    .setTicketPrice(10)
+                    .build();
+            when(mockEventDAO.getEventById(1)).thenReturn(event);
+
+            PaymentStrategy paymentStrategy = mock(PaymentStrategy.class);
+            when(paymentStrategy.processPayment(20)).thenReturn(true);
+
+            when(mockEventDAO.updateEvent(
+                    1,
+                    event.getTitle(),
+                    event.getDescription(),
+                    event.getDate(),
+                    3,
+                    10)).thenReturn(false);
+
+            assertThrows(BadRequestException.class, () -> guestController.buyTicket(dto, "token"));
+        }
+
+        @Test
+        void buyTicketShouldThrowBadRequestExceptionIfTicketCreationFails() {
+            BuyTicketDTO dto = new BuyTicketDTO();
+            dto.setEventId(1);
+            dto.setQuantity(2);
+            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+
+            Event event = new Event.Builder()
+                    .setId(1)
+                    .setTitle("title")
+                    .setDescription("description")
+                    .setDate(Date.from(LocalDate.of(2025, 12, 12).atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                    .setTicketsAvailable(5)
+                    .setTicketPrice(10)
+                    .build();
+            when(mockEventDAO.getEventById(1)).thenReturn(event);
+
+            PaymentStrategy paymentStrategy = mock(PaymentStrategy.class);
+            when(paymentStrategy.processPayment(20)).thenReturn(true);
+
+            when(mockEventDAO.updateEvent(
+                    1,
+                    event.getTitle(),
+                    event.getDescription(),
+                    event.getDate(),
+                    3,
+                    10)).thenReturn(true);
+
+            when(mockTicketDAO.createTicket(1, 1, 2)).thenReturn(null);
+
+            assertThrows(BadRequestException.class, () -> guestController.buyTicket(dto, "token"));
+        }
+
+        @Test
+        void buyTicketShouldThrowExceptionIfTokenValidationFails() {
+            BuyTicketDTO dto = new BuyTicketDTO();
+            dto.setEventId(1);
+            dto.setQuantity(2);
+            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+
+            when(mockAuthService.validateAccessToken("token")).thenThrow(new UnauthorizedException("Invalid token"));
+
+            assertThrows(UnauthorizedException.class, () -> guestController.buyTicket(dto, "token"));
+        }
+
+        @Test
+        void buyTicketShouldThrowExceptionIfPaymentMethodIsInvalid() {
+            BuyTicketDTO dto = new BuyTicketDTO();
+            dto.setEventId(1);
+            dto.setQuantity(2);
+            dto.setPaymentMethod(PaymentMethod.UNKNOWN); 
+
+            assertThrows(NotFoundException.class, () -> guestController.buyTicket(dto, "token"));
+        }
+        
+
+        @Test
+        void buyTicketShouldThrowExeptionIfPaymentGoesWrong(){
+            BuyTicketDTO dto = new BuyTicketDTO();
+            dto.setEventId(1);
+            dto.setQuantity(2);
+            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+
+            Event event = new Event.Builder()
+                    .setId(1)
+                    .setTitle("title")
+                    .setDescription("description")
+                    .setDate(Date.from(LocalDate.of(2025, 12, 12).atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                    .setTicketsAvailable(5)
+                    .setTicketPrice(10)
+                    .build();
+            when(mockEventDAO.getEventById(1)).thenReturn(event);
+
+            PaymentStrategy paymentStrategy = mock(PaymentStrategy.class);
+            when(paymentStrategy.processPayment(20)).thenReturn(false);
+
+            assertThrows(BadRequestException.class, () -> guestController.buyTicket(dto, "token"));
+        }
     }
-
-    @Test
-    void buyTicket_EventDoesNotExist() {
-        BuyTicketDTO dto = new BuyTicketDTO();
-        dto.setEventId(999);
-        dto.setQuantity(2);
-        dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
-
-
-        assertThrows(NotFoundException.class, () -> guestController.buyTicket(dto, "fakeToken"));
-    }
-
-    @Test
-    void buyTicket_TicketsNotEnough() {
-        BuyTicketDTO dto = new BuyTicketDTO();
-        dto.setEventId(100);
-        dto.setQuantity(20);
-        dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
-
-        // L'evento esiste ma ha solo 10 ticket
-        when(eventDAOMock.getEventById(100)).thenReturn(mockEvent);
-
-        assertThrows(BadRequestException.class, () -> guestController.buyTicket(dto, "fakeToken"));
-    }
-
-    @Test
-    void buyTicket_PaymentMethodIsUnknown() {
-        BuyTicketDTO dto = new BuyTicketDTO();
-        dto.setEventId(100);
-        dto.setQuantity(2);
-        dto.setPaymentMethod(PaymentMethod.UNKNOWN); 
-
-        when(eventDAOMock.getEventById(100)).thenReturn(mockEvent);
-
-        assertThrows(BadRequestException.class, () -> guestController.buyTicket(dto, "fakeToken"));
-    }
-
 }

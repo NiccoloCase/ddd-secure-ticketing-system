@@ -1,8 +1,6 @@
 package org.swe.model;
 
-import java.util.Date;
-
-public class Ticket {
+public final class Ticket {
     private int id;
     private int userId;
     private int eventId;
@@ -11,11 +9,11 @@ public class Ticket {
 
 
     public Ticket(int id, int userId, int eventId, int quantity, boolean used) {
-        this.id = id;
-        this.userId = userId;
-        this.quantity = quantity;
-        this.used = used;
-        this.eventId = eventId;
+        this.setId(id);
+        this.setUserId(userId);
+        this.setEventId(eventId);
+        this.setQuantity(quantity);
+        this.setUsed(used);
     }
 
     public int getId() {
@@ -23,6 +21,9 @@ public class Ticket {
     }
 
     public void setId(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Ticket ID must be greater than 0.");
+        }
         this.id = id;
     }
 
@@ -31,7 +32,21 @@ public class Ticket {
     }
 
     public void setUserId(int userId) {
+        if (userId <= 0) {
+            throw new IllegalArgumentException("User ID must be greater than 0.");
+        }
         this.userId = userId;
+    }
+
+    public int getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(int eventId) {
+        if (eventId <= 0) {
+            throw new IllegalArgumentException("Event ID must be greater than 0.");
+        }
+        this.eventId = eventId;
     }
 
     public int getQuantity() {
@@ -39,6 +54,9 @@ public class Ticket {
     }
 
     public void setQuantity(int quantity) {
+        if (quantity < 1) {
+            throw new IllegalArgumentException("Quantity must be at least 1.");
+        }
         this.quantity = quantity;
     }
 
@@ -50,11 +68,15 @@ public class Ticket {
         this.used = used;
     }
 
-    public int getEventId() {
-        return eventId;
+    @Override
+    public String toString() {
+        return "Ticket{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", eventId=" + eventId +
+                ", quantity=" + quantity +
+                ", used=" + used +
+                '}';
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
-    }
 }

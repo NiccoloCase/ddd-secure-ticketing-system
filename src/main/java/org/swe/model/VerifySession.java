@@ -1,20 +1,20 @@
 package org.swe.model;
 
+
 public class VerifySession {
+
+    private Guest guest;
     private Integer staffId;
     private Integer eventId;
-    private Integer ticketId;
     private VerifySessionStatus status;
 
 
-    public VerifySession(Integer staffId, Integer eventId, Integer ticketId) {
+    public VerifySession(Integer staffId, Integer eventId) {
         this.staffId = staffId;
         this.eventId = eventId;
-        this.ticketId = ticketId;
-        this.status = VerifySessionStatus.PENDING;
+        this.status = VerifySessionStatus.WAITING_FOR_GUEST;
     }
 
-    // Getters, setters
     public Integer getStaffId() {
         return staffId;
     }
@@ -31,12 +31,12 @@ public class VerifySession {
         this.eventId = eventId;
     }
 
-    public Integer getTicketId() {
-        return ticketId;
+    public void linkSessionToGuest(Guest guest) {
+        this.guest = guest;
     }
 
-    public void setTicketId(Integer ticketId) {
-        this.ticketId = ticketId;
+    public Guest getGuest() {
+        return guest; 
     }
 
     public VerifySessionStatus getStatus() {

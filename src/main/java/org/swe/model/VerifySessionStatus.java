@@ -2,6 +2,7 @@ package org.swe.model;
 
 public enum VerifySessionStatus {
     PENDING,
-    VERIFIED,
+    WAITING_FOR_GUEST,
+    VALIDATED,
     INVALID
 }

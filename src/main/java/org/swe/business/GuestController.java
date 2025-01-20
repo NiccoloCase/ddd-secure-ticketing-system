@@ -1,7 +1,5 @@
 package org.swe.business;
 
-import java.util.List;
-
 import org.swe.core.DAO.EventDAO;
 import org.swe.core.DAO.TicketDAO;
 import org.swe.core.DAO.UserDAO;
@@ -11,12 +9,14 @@ import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.utils.JWTUtility;
 import org.swe.model.Event;
+import org.swe.model.Guest;
 import org.swe.model.PaymentContext;
 import org.swe.model.PaymentStrategy;
 import org.swe.model.PaymentStrategyFactory;
 import org.swe.model.Ticket;
 import org.swe.model.User;
 import org.swe.model.VerifySession;
+import org.swe.model.VerifySessionStatus;
 
 import io.jsonwebtoken.Claims;
 
@@ -31,7 +31,6 @@ public class GuestController extends UserController {
         this.verifySessionService = verifySessionService;
         this.eventDAO = eventDAO;
         this.ticketDAO = ticketDAO;
-
     }
 
     public Ticket buyTicket(BuyTicketDTO dto, String token) {
@@ -80,7 +79,7 @@ public class GuestController extends UserController {
     }
 
     public boolean scanStaffVerificationCode(ScanStaffVerificationCodeDTO dto, String token) {
-        User user = authInterceptor(token);
+        Guest guest = (Guest) authInterceptor(token);
 
         String code = dto.getCode();
         if (code == null) {
@@ -101,37 +100,14 @@ public class GuestController extends UserController {
 
         Integer eventId = session.getEventId();
         if (eventId == null) {
+            session.setStatus(VerifySessionStatus.INVALID);
             throw new BadRequestException("No eventId found in session.");
         }
 
-        List<Ticket> userTickets = ticketDAO.getTicketsByUserAndEvent(user.getId(), eventId);
-        if (userTickets == null || userTickets.isEmpty()) {
-            verifySessionService.rejectSession(sessionKey);
-            return false;
-        }
-
-        Ticket validTicket = null;
-        for (Ticket t : userTickets) {
-            if (!t.isUsed()) {
-                validTicket = t;
-                break; // TODO: gestire il caso in cui ci siano più ticket validi
-            }
-        }
-        if (validTicket == null) {
-            verifySessionService.rejectSession(sessionKey);
-            return false;
-        }
-
-        boolean updated = ticketDAO.setTicketUsed(validTicket.getId());
-        if (!updated) {
-            verifySessionService.rejectSession(sessionKey);
-            throw new RuntimeException("Failed to mark ticket as used in DB.");
-        }
-
-        verifySessionService.verifySession(sessionKey, validTicket.getId());
+        session.linkSessionToGuest(guest);
+        session.setStatus(VerifySessionStatus.PENDING);
 
         return true;
-
     }
 
 }

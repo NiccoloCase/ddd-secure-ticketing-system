@@ -14,10 +14,10 @@ public interface VerifySessionService {
 
     void clearSession();
 
-    void verifySession(String key, Integer ticketId);
+    void validateSession(String key);
 
     void rejectSession(String key);
 
-    void rejectSession(String key, Integer ticketId);
+    String generateVerificationCode(String key, VerifySession session);
 
 }

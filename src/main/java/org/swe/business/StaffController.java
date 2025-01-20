@@ -95,6 +95,8 @@ public class StaffController extends UserController {
         }
 
         verifySessionService.validateSession(payload.getSessionKey());
-        return new VerificationSessionResult(verifySession.getGuest(), verifySession.getStatus(), validTickets);
+        return new VerificationSessionResult(
+                verifySession.getGuest().getIdentity()
+                , verifySession.getStatus(), validTickets);
     }
 }

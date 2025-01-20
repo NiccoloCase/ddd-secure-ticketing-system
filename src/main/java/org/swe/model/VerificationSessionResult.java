@@ -1,18 +1,18 @@
 package org.swe.model;
 
 public final class VerificationSessionResult {
-     private final Guest guest;
+     private final String guestIdentity;
      private final VerifySessionStatus status;
      private final int validatedTickets;
 
-     public VerificationSessionResult(Guest guest, VerifySessionStatus status, int validatedTickets) {
-          this.guest = guest;
+     public VerificationSessionResult(String guestIdentity, VerifySessionStatus status, int validatedTickets) {
+          this.guestIdentity = guestIdentity;
           this.status = status;
           this.validatedTickets = validatedTickets;
      }
 
-     public Guest getGuest() {
-          return guest;
+     public String getGuestIdentity() {
+          return guestIdentity;
      }
      
      public VerifySessionStatus getStatus() {

@@ -25,6 +25,10 @@ public class User {
         return PasswordUtility.checkPassword(password, passwordHash);
     }
 
+    public String getIdentity() {
+        return name + " " + surname;
+    }
+
 
     public String getName() {
         return name;

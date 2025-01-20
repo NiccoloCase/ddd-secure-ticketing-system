@@ -37,7 +37,7 @@ public class StaffController extends UserController {
         return verifySessionService.addToSession(verifySession);
     }
 
-    public VerificationSessionResult ValidateSessiont(GetVerificationSessionResultDTO payload, String token) throws BadRequestException {
+    public VerificationSessionResult validateVerificationSession(GetVerificationSessionResultDTO payload, String token) throws BadRequestException {
         validationInterceptor(payload);
         Staff staff = (Staff) authInterceptor(token);
         VerifySession verifySession = null;
@@ -46,20 +46,22 @@ public class StaffController extends UserController {
         try{
             verifySession = verifySessionService.getFromSession(payload.getSessionKey());
         } catch (Exception e) {
-            verifySession.setStatus(VerifySessionStatus.INVALID);
             throw new BadRequestException("Session does not exist");
         }
         
 
         // Check if the session is for the current staff member
         if(verifySession.getStaffId() != staff.getId()){
-            verifySession.setStatus(VerifySessionStatus.INVALID);
             throw new BadRequestException("Session does not belong to the current staff member");
         }
 
-        // Check if the session is still pending or does not have a ticket id
+        // Check if the session is already validated
+        if(verifySession.getStatus()==VerifySessionStatus.VALIDATED){
+            throw new BadRequestException("Session is already validated");
+        }
+
+        // Check if the session is still pending or if there is no guest linked to the session
         if(!(verifySession.getStatus()==VerifySessionStatus.PENDING) || verifySession.getGuest()==null){
-            verifySession.setStatus(VerifySessionStatus.INVALID);
             throw new BadRequestException("Session is still pending or there is no guest linked to the session");
         }
 
@@ -67,7 +69,7 @@ public class StaffController extends UserController {
         List<Ticket> tickets = ticketDAO.getTicketsByUserAndEvent(verifySession.getGuest().getId(), verifySession.getEventId());
         
         // Check if the ticket is valid
-        if (tickets.size() == 0) {
+        if (tickets.isEmpty()) {
             verifySession.setStatus(VerifySessionStatus.INVALID);
             throw new BadRequestException("No tickets found for the user and event");
         }
@@ -76,13 +78,12 @@ public class StaffController extends UserController {
         int validTickets = 0;
         int i;
         for (i = 0; i < tickets.size(); i++) {
-            if (tickets.get(i).isUsed() == false) {
+            if (!tickets.get(i).isUsed()) {
                 try{
                     ticketDAO.setTicketUsed(tickets.get(i).getId());
                     validTickets+=tickets.get(i).getQuantity();
                 } catch (Exception e) {
                     i--;
-                    continue;
                 }
             }
         }
@@ -94,8 +95,6 @@ public class StaffController extends UserController {
         }
 
         verifySessionService.validateSession(payload.getSessionKey());
-         
         return new VerificationSessionResult(verifySession.getGuest(), verifySession.getStatus(), validTickets);
-        
     }
 }

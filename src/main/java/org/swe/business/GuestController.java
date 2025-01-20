@@ -105,9 +105,7 @@ public class GuestController extends UserController {
         }
 
         session.linkSessionToGuest(guest);
-        session.setStatus(VerifySessionStatus.PENDING);
 
         return true;
     }
-
 }

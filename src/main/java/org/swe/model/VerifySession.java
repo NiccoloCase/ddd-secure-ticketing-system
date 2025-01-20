@@ -33,6 +33,7 @@ public class VerifySession {
 
     public void linkSessionToGuest(Guest guest) {
         this.guest = guest;
+        this.status = VerifySessionStatus.PENDING;
     }
 
     public Guest getGuest() {

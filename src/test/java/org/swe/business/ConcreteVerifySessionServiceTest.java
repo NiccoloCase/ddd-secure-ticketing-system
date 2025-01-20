@@ -85,7 +85,6 @@ class ConcreteVerifySessionServiceTest {
 
         VerifySession updatedSession = service.getFromSession(key);
         assertNotNull(updatedSession, "Session should exist");
-        //assertEquals(999, updatedSession.getTicketId(), "Ticket ID should be updated");
         assertEquals(VerifySessionStatus.VALIDATED, updatedSession.getStatus(), "Status should be VERIFIED");
     }
 
@@ -99,7 +98,7 @@ class ConcreteVerifySessionServiceTest {
     @Test
     void testRejectSession() {
         VerifySession session = new VerifySession(1, 1001);
-        String key = service.addToSession( session);
+        String key = service.addToSession(session);
 
         service.rejectSession(key);
 
@@ -119,12 +118,9 @@ class ConcreteVerifySessionServiceTest {
     void testRejectSessionWithTicketId() {
         VerifySession session = new VerifySession(1, 1001);
         String key = service.addToSession(session);
-
         service.rejectSession(key);
-
         VerifySession updatedSession = service.getFromSession(key);
         assertNotNull(updatedSession, "Session should exist");
-        //assertEquals(999, updatedSession.getTicketId(), "Ticket ID should be set");
         assertEquals(VerifySessionStatus.INVALID, updatedSession.getStatus(), "Status should be INVALID");
     }
 
@@ -134,5 +130,4 @@ class ConcreteVerifySessionServiceTest {
             service.rejectSession("nonExistingSession");
         });
     }
-
 }

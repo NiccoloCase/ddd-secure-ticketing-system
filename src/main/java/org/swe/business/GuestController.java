@@ -65,7 +65,7 @@ public class GuestController extends UserController {
                 event.getTitle(),
                 event.getDescription(),
                 event.getDate(),
-                available - dto.getQuantity(), // decremento
+                available - dto.getQuantity(), // decrease available tickets
                 event.getTicketPrice());
         if (!success) {
             throw new BadRequestException("Failed to update event ticket availability.");

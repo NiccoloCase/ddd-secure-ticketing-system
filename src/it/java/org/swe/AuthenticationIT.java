@@ -7,7 +7,6 @@ import org.swe.core.DBM.DBManager;
 import org.swe.core.DTO.CreateUserDTO;
 import org.swe.core.DTO.LoginDTO;
 import org.swe.core.exceptions.BadRequestException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -23,16 +22,12 @@ public class AuthenticationIT {
 
         DBManager.getInstance().clearTables();
         System.out.println("Tables cleared");
-
-
     }
 
     @AfterAll
     public static void tearDown() {
         DBManager.getInstance().clearTables();
     }
-
-
 
     @Test
     @Order(1)
@@ -78,5 +73,5 @@ public class AuthenticationIT {
         String token = userController.login(user);
         String nameAndSurname = userController.whoami(token);
         assertEquals("Mario Rossi", nameAndSurname);
-        }
+    }
 }

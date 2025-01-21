@@ -3,7 +3,7 @@ package org.swe.model;
 
 public class VerifySession {
 
-    private Guest guest;
+    private User user;
     private Integer staffId;
     private Integer eventId;
     private VerifySessionStatus status;
@@ -31,13 +31,13 @@ public class VerifySession {
         this.eventId = eventId;
     }
 
-    public void linkSessionToGuest(Guest guest) {
-        this.guest = guest;
+    public void linkSessionToUser(User user) {
+        this.user = user;
         this.status = VerifySessionStatus.PENDING;
     }
 
-    public Guest getGuest() {
-        return guest; 
+    public User getUser() {
+        return user; 
     }
 
     public VerifySessionStatus getStatus() {

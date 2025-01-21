@@ -9,7 +9,6 @@ import org.swe.core.Config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
@@ -42,21 +41,16 @@ public class JWTUtility {
      */
     public static Claims validateToken(String token) {
         SecretKey secretKey = Keys.hmacShaKeyFor(Config.JWT_SECRET.getBytes());
-
         try {
-            JwtParser parser = Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build();
-            Object payload = parser.parse(token).getPayload();
-
-            if (payload instanceof Claims) {
-                return (Claims) payload;
-            }
+            return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)  
+                .getPayload();             // getPayload restituisce direttamente Claims
         } catch (ExpiredJwtException | MalformedJwtException | SecurityException | IllegalArgumentException e) {
             System.err.println("Token validation failed: " + e.getMessage());
             return null;
         }
-        return null;
     }
 }
 

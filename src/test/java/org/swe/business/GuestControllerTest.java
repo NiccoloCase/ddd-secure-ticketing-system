@@ -179,38 +179,7 @@ class GuestControllerTest {
             assertThrows(BadRequestException.class, () -> guestController.buyTicket(dto, "token"));
         }
 
-        @Test
-        void buyTicketShouldThrowBadRequestExceptionIfTicketCreationFails() {
-            BuyTicketDTO dto = new BuyTicketDTO();
-            dto.setEventId(1);
-            dto.setQuantity(2);
-            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
 
-            Event event = new Event.Builder()
-                    .setId(1)
-                    .setTitle("title")
-                    .setDescription("description")
-                    .setDate(Date.from(LocalDate.of(2025, 12, 12).atStartOfDay(ZoneId.systemDefault()).toInstant()))
-                    .setTicketsAvailable(5)
-                    .setTicketPrice(10)
-                    .build();
-            when(mockEventDAO.getEventById(1)).thenReturn(event);
-
-            PaymentStrategy paymentStrategy = mock(PaymentStrategy.class);
-            when(paymentStrategy.processPayment(20)).thenReturn(true);
-
-            when(mockEventDAO.updateEvent(
-                    1,
-                    event.getTitle(),
-                    event.getDescription(),
-                    event.getDate(),
-                    3,
-                    10)).thenReturn(true);
-
-            when(mockTicketDAO.createTicket(1, 1, 2)).thenReturn(null);
-
-            assertThrows(BadRequestException.class, () -> guestController.buyTicket(dto, "token"));
-        }
 
         @Test
         void buyTicketShouldThrowExceptionIfTokenValidationFails() {

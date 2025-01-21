@@ -166,7 +166,7 @@ public class EventIT {
      
 
      @Test
-     @Order(19)
+     @Order(11)
      public void notAdminDeleteShouldThrowException() {
           List<Event> events = adminController.getAllEvents(token);
           for(Event e : events) {
@@ -178,7 +178,7 @@ public class EventIT {
 
 
      @Test
-     @Order(20)
+     @Order(12)
      public void deleteEventShouldReturnTrue() {
           List<Event> events = adminController.getAllEvents(token);
           for(Event e : events) {
@@ -187,8 +187,4 @@ public class EventIT {
                }
           }
      }
-
-     
-
-
 }

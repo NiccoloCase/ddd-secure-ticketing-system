@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-
 import org.swe.core.exceptions.InternalServerErrorException;
 import org.swe.core.utils.JWTUtility;
+import org.swe.model.SessionResponse;
 import org.swe.model.VerifySession;
 import org.swe.model.VerifySessionStatus;
 
@@ -14,11 +14,14 @@ public class ConcreteVerifySessionService implements VerifySessionService {
     private final Map<String, VerifySession> sessionData = new HashMap<>();
 
     @Override
-    public String addToSession(VerifySession value) {
-        String key = generateNewSessionKey();
-        sessionData.put(key, value);
-        return key;
-    }
+    public SessionResponse addToSession(VerifySession value) {
+    String key = generateNewSessionKey();
+    sessionData.put(key, value);
+
+    String verificationCode = generateVerificationCode(key, value);
+
+    return new SessionResponse(key, verificationCode);
+}
 
     @Override
     public VerifySession getFromSession(String key) {

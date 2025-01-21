@@ -1,12 +1,17 @@
 package org.swe.business;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.swe.core.exceptions.InternalServerErrorException;
 import org.swe.model.VerifySession;
 import org.swe.model.VerifySessionStatus;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ConcreteVerifySessionServiceTest {
 
@@ -20,7 +25,7 @@ class ConcreteVerifySessionServiceTest {
     @Test
     void testAddToSession() {
         VerifySession session = new VerifySession(1, 1001);
-        String key = service.addToSession(session);
+        String key = service.addToSession(session).getKey();
 
         VerifySession retrievedSession = service.getFromSession(key);
         assertNotNull(retrievedSession, "Session should be retrieved successfully");
@@ -31,8 +36,8 @@ class ConcreteVerifySessionServiceTest {
     void testUniqueSessionKeys() {
         VerifySession session1 = new VerifySession(1, 1001);
         VerifySession session2 = new VerifySession(2, 1002);
-        String key1 = service.addToSession(session1);
-        String key2 = service.addToSession(session2);
+        String key1 = service.addToSession(session1).getKey();
+        String key2 = service.addToSession(session2).getKey();
 
         assertNotEquals(key1, key2, "The session keys should be unique");
     }
@@ -47,7 +52,7 @@ class ConcreteVerifySessionServiceTest {
     @Test
     void testRemoveFromSession() {
         VerifySession session = new VerifySession(1, 1001);
-        String key = service.addToSession(session);
+        String key = service.addToSession(session).getKey();
         service.removeFromSession(key);
 
         VerifySession retrievedSession = service.getFromSession(key);
@@ -57,7 +62,7 @@ class ConcreteVerifySessionServiceTest {
     @Test
     void testIsInSession() {
         VerifySession session = new VerifySession(1, 1001);
-        String key = service.addToSession(session);
+        String key = service.addToSession(session).getKey();
 
         assertTrue(service.isInSession(key), "The session should exist in the session data");
         assertFalse(service.isInSession("nonExistingSession"), "The session should not exist in the session data");
@@ -67,8 +72,8 @@ class ConcreteVerifySessionServiceTest {
     void testClearSession() {
         VerifySession session1 = new VerifySession(1, 1001);
         VerifySession session2 = new VerifySession(2, 1002);
-        String key1 = service.addToSession(session1);
-        String key2 = service.addToSession(session2);
+        String key1 = service.addToSession(session1).getKey();
+        String key2 = service.addToSession(session2).getKey();
 
         service.clearSession();
 
@@ -79,7 +84,7 @@ class ConcreteVerifySessionServiceTest {
     @Test
     void testValidateSession() {
         VerifySession session = new VerifySession(1, 1001);
-        String key = service.addToSession( session);
+        String key = service.addToSession( session).getKey();
 
         service.validateSession(key);
 
@@ -98,7 +103,7 @@ class ConcreteVerifySessionServiceTest {
     @Test
     void testRejectSession() {
         VerifySession session = new VerifySession(1, 1001);
-        String key = service.addToSession(session);
+        String key = service.addToSession(session).getKey();
 
         service.rejectSession(key);
 
@@ -117,7 +122,7 @@ class ConcreteVerifySessionServiceTest {
     @Test
     void testRejectSessionWithTicketId() {
         VerifySession session = new VerifySession(1, 1001);
-        String key = service.addToSession(session);
+        String key = service.addToSession(session).getKey();
         service.rejectSession(key);
         VerifySession updatedSession = service.getFromSession(key);
         assertNotNull(updatedSession, "Session should exist");

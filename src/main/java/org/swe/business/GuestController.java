@@ -9,7 +9,6 @@ import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.utils.JWTUtility;
 import org.swe.model.Event;
-import org.swe.model.Guest;
 import org.swe.model.PaymentContext;
 import org.swe.model.PaymentStrategy;
 import org.swe.model.PaymentStrategyFactory;
@@ -35,51 +34,63 @@ public class GuestController extends UserController {
 
     public Ticket buyTicket(BuyTicketDTO dto, String token) {
         validationInterceptor(dto);
-
         User user = authInterceptor(token);
-
         Event event = eventDAO.getEventById(dto.getEventId());
+        
         if (event == null) {
             throw new NotFoundException("Event not found");
         }
-
+        
         int available = event.getTicketsAvailable();
         if (available < dto.getQuantity()) {
             throw new BadRequestException("Not enough tickets available.");
         }
+        
+        // Processo pagamento
         PaymentContext paymentContext = new PaymentContext();
-
         PaymentStrategy paymentStrategy = PaymentStrategyFactory.getPaymentStrategy(dto.getPaymentMethod());
-
         paymentContext.setPaymentStrategy(paymentStrategy);
-
         boolean paymentSuccess = paymentContext.executePayment(event.getTicketPrice() * dto.getQuantity());
-
+        
         if (!paymentSuccess) {
             throw new BadRequestException("Payment failed. Please try again.");
         }
-
+        
+        // Aggiorna disponibilità biglietti
         boolean success = eventDAO.updateEvent(
+            event.getId(),
+            event.getTitle(),
+            event.getDescription(),
+            event.getDate(),
+            available - dto.getQuantity(),
+            event.getTicketPrice()
+        );
+        
+        if (!success) {
+            // TODO: Se l'aggiornamento fallisce, dovremmo gestire il rollback del pagamento
+            throw new BadRequestException("Failed to update event ticket availability.");
+        }
+        
+        // Crea il ticket e verifica che sia stato creato correttamente
+        Ticket ticket = ticketDAO.createTicket(user.getId(), dto.getEventId(), dto.getQuantity());
+        if (ticket == null) {
+            // Rollback delle modifiche
+            eventDAO.updateEvent(
                 event.getId(),
                 event.getTitle(),
                 event.getDescription(),
                 event.getDate(),
-                available - dto.getQuantity(), // decrease available tickets
-                event.getTicketPrice());
-        if (!success) {
-            throw new BadRequestException("Failed to update event ticket availability.");
+                available,  // ripristina disponibilità originale
+                event.getTicketPrice()
+            );
+            throw new RuntimeException("Failed to create ticket");
         }
-
-        Ticket newTicket = ticketDAO.createTicket(user.getId(), dto.getEventId(), dto.getQuantity());
-        if (newTicket == null) {
-            throw new BadRequestException("Failed to create ticket.");
-        }
-
-        return newTicket;
+        
+        return ticket;
     }
 
     public boolean scanStaffVerificationCode(ScanStaffVerificationCodeDTO dto, String token) {
-        Guest guest = (Guest) authInterceptor(token);
+        User user = authInterceptor(token);
 
         String code = dto.getCode();
         if (code == null) {
@@ -104,7 +115,7 @@ public class GuestController extends UserController {
             throw new BadRequestException("No eventId found in session.");
         }
 
-        session.linkSessionToGuest(guest);
+        session.linkSessionToUser(user);
 
         return true;
     }

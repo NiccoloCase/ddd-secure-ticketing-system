@@ -1,14 +1,13 @@
 package org.swe.business;
 
-import org.swe.core.DAO.UserDAO;
-
 import java.util.List;
 
 import org.swe.core.DAO.TicketDAO;
+import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.GetVerificationSessionResultDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
-import org.swe.model.Staff;
+import org.swe.model.SessionResponse;
 import org.swe.model.Ticket;
 import org.swe.model.User;
 import org.swe.model.VerificationSessionResult;
@@ -26,7 +25,7 @@ public class StaffController extends UserController {
         this.ticketDAO = ticketDAO;
     }
 
-    public String startVerificationSession(StartVerificationSessionDTO payload, String token) {
+    public SessionResponse startVerificationSession(StartVerificationSessionDTO payload, String token) {
         validationInterceptor(payload);
         User staff = authInterceptor(token);
 
@@ -39,7 +38,7 @@ public class StaffController extends UserController {
 
     public VerificationSessionResult validateVerificationSession(GetVerificationSessionResultDTO payload, String token) throws BadRequestException {
         validationInterceptor(payload);
-        Staff staff = (Staff) authInterceptor(token);
+        User userStaff = authInterceptor(token);
         VerifySession verifySession = null;
         
         // Get the session from the session key if it exists
@@ -51,7 +50,7 @@ public class StaffController extends UserController {
         
 
         // Check if the session is for the current staff member
-        if(verifySession.getStaffId() != staff.getId()){
+        if(verifySession.getStaffId() != userStaff.getId()){
             throw new BadRequestException("Session does not belong to the current staff member");
         }
 
@@ -61,12 +60,12 @@ public class StaffController extends UserController {
         }
 
         // Check if the session is still pending or if there is no guest linked to the session
-        if(!(verifySession.getStatus()==VerifySessionStatus.PENDING) || verifySession.getGuest()==null){
+        if(!(verifySession.getStatus()==VerifySessionStatus.PENDING) || verifySession.getUser()==null){
             throw new BadRequestException("Session is still pending or there is no guest linked to the session");
         }
 
         // Get all the tickets for the user and the event
-        List<Ticket> tickets = ticketDAO.getTicketsByUserAndEvent(verifySession.getGuest().getId(), verifySession.getEventId());
+        List<Ticket> tickets = ticketDAO.getTicketsByUserAndEvent(verifySession.getUser().getId(), verifySession.getEventId());
         
         // Check if the ticket is valid
         if (tickets.isEmpty()) {
@@ -96,7 +95,7 @@ public class StaffController extends UserController {
 
         verifySessionService.validateSession(payload.getSessionKey());
         return new VerificationSessionResult(
-                verifySession.getGuest().getIdentity()
+                verifySession.getUser().getIdentity()
                 , verifySession.getStatus(), validTickets);
     }
 }

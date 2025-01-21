@@ -14,6 +14,7 @@ import org.swe.model.Event;
 public class ConcreteAdminDAO implements AdminDAO {
 
     private DBManager dbManager = DBManager.getInstance();
+    
 
     @Override
     public boolean addAdminToEvent(int userId, int eventId) {

@@ -1,4 +1,4 @@
-package org.swe;
+package org.swe.it.java.org.swe;
 
 import org.junit.jupiter.api.*;
 import org.swe.business.ApplicationManager;

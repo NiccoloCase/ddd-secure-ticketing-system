@@ -1,10 +1,11 @@
 package org.swe.business;
 
+import org.swe.model.SessionResponse;
 import org.swe.model.VerifySession;
 
 public interface VerifySessionService {
 
-    String addToSession(VerifySession value);
+    SessionResponse addToSession(VerifySession value);
 
     VerifySession getFromSession(String key);
 

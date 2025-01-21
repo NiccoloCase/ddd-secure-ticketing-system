@@ -86,12 +86,10 @@ public class AdminController extends UserController {
     public List<Event> getAllEvents(String token) {
         User user = authInterceptor(token);
 
-        // restituisce solo eventi di cui è admin.
-
         return adminDAO.getEventsByAdminUserId(user.getId());
     }
 
-    public void addStaff(AddStaffToEventDTO dto, String token) {
+    public boolean addStaff(AddStaffToEventDTO dto, String token) {
         validationInterceptor(dto);
         User user = authInterceptor(token);
 
@@ -109,9 +107,10 @@ public class AdminController extends UserController {
         if (!success) {
             throw new RuntimeException("Failed to add staff to event.");
         }
+        return true;
     }
 
-    public void removeStaff(RemoveStaffFromEventDTO dto, String token) {
+    public boolean removeStaff(RemoveStaffFromEventDTO dto, String token) {
         validationInterceptor(dto);
         User user = authInterceptor(token);
 
@@ -129,6 +128,8 @@ public class AdminController extends UserController {
         if (!success) {
             throw new RuntimeException("Failed to remove staff from event.");
         }
+
+        return success;
     }
 
 }

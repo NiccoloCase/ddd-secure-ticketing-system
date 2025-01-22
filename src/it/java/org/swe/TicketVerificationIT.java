@@ -148,7 +148,7 @@ public class TicketVerificationIT {
         assertEquals(VerifySessionStatus.VALIDATED, result.getStatus(),
                 "After validation the status should be VALIDATED");
 
-        assertEquals(2, result.getValidatedTickets(),
+        assertEquals(2, result.getQuantity(),
                 "The number of validated tickets should be equal to the number of tickets bought by the guest");
     }
 

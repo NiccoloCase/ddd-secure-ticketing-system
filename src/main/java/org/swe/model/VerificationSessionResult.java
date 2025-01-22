@@ -3,12 +3,12 @@ package org.swe.model;
 public final class VerificationSessionResult {
      private final String userIdentity;
      private final VerifySessionStatus status;
-     private final int validatedTickets;
+     private final int quantity;
 
-     public VerificationSessionResult(String guestIdentity, VerifySessionStatus status, int validatedTickets) {
+     public VerificationSessionResult(String guestIdentity, VerifySessionStatus status, int quantity) {
           this.userIdentity = guestIdentity;
           this.status = status;
-          this.validatedTickets = validatedTickets;
+          this.quantity = quantity;
      }
 
      public String getUserIdentity() {
@@ -19,7 +19,7 @@ public final class VerificationSessionResult {
           return status;
      }
 
-     public int getValidatedTickets() {
-          return validatedTickets;
+     public int getQuantity() {
+          return quantity;
      }
 }

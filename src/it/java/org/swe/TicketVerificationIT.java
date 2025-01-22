@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -25,6 +26,7 @@ import org.swe.core.DTO.CreateUserDTO;
 import org.swe.core.DTO.GetVerificationSessionResultDTO;
 import org.swe.core.DTO.ScanStaffVerificationCodeDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
+import org.swe.core.exceptions.BadRequestException;
 import org.swe.model.PaymentMethod;
 import org.swe.model.SessionResponse;
 import org.swe.model.Ticket;
@@ -157,5 +159,88 @@ public class TicketVerificationIT {
 
         assertEquals(2, result.getValidatedTickets(),
                 "Dovrebbero essere validati 2 ticket (quanti ne ha comprati il guest)");
+    }
+
+    @Test
+    @Order(7)
+    public void staffCannotValidateSessionBelongingToAnotherStaff() {
+
+        CreateUserDTO otherStaffDto = new CreateUserDTO("Another", "Staff", "anotherstaff@test.it", "password");
+        String otherStaffToken = staffController.signup(otherStaffDto);
+        assertNotNull(otherStaffToken);
+
+        StartVerificationSessionDTO startDTO = new StartVerificationSessionDTO(eventId);
+        SessionResponse otherStaffSession = staffController.startVerificationSession(startDTO, otherStaffToken);
+        String otherStaffSessionKey = otherStaffSession.getKey();
+
+        // provo a validare questa sessione (che appartiene a "anotherStaff")
+        // usando staffToken (quello creato nei test precedenti)
+        GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO(otherStaffSessionKey);
+
+        assertThrows(BadRequestException.class, () -> {
+            staffController.validateVerificationSession(dto, staffToken);
+        });
+    }
+
+    @Test
+    @Order(8)
+    public void staffCannotValidateAlreadyValidatedSession() {
+        CreateUserDTO tempStaffDto = new CreateUserDTO("TempStaff", "TempSurname", "tempstaff@test.it", "password");
+        String tempStaffToken = staffController.signup(tempStaffDto);
+        assertNotNull(tempStaffToken);
+
+        CreateUserDTO tempGuestDto = new CreateUserDTO("TempGuest", "TempSurname", "tempguest@test.it", "password");
+        String tempGuestToken = guestController.signup(tempGuestDto);
+        assertNotNull(tempGuestToken);
+
+        BuyTicketDTO buyTicketDTO = new BuyTicketDTO();
+        buyTicketDTO.setEventId(eventId);
+        buyTicketDTO.setQuantity(3);
+        buyTicketDTO.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+        guestController.buyTicket(buyTicketDTO, tempGuestToken);
+
+        StartVerificationSessionDTO startDTO = new StartVerificationSessionDTO(eventId);
+        SessionResponse tempSession = staffController.startVerificationSession(startDTO, tempStaffToken);
+        String sessionKey = tempSession.getKey();
+        assertNotNull(sessionKey);
+
+        ScanStaffVerificationCodeDTO scanDTO = new ScanStaffVerificationCodeDTO();
+        scanDTO.setCode(tempSession.getVerificationCode()); 
+        guestController.scanStaffVerificationCode(scanDTO, tempGuestToken);
+
+        //Staff valida la sessione correttamente la prima volta
+        GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO(sessionKey);
+        VerificationSessionResult result = staffController.validateVerificationSession(dto, tempStaffToken);
+        assertNotNull(result);
+
+        assertEquals(VerifySessionStatus.VALIDATED, result.getStatus());
+
+        //Riprovo a validare la stessa sessione
+        assertThrows(BadRequestException.class, () -> {
+            staffController.validateVerificationSession(dto, tempStaffToken);
+        }, "Mi aspetto eccezione perché la sessione è già validata");
+    }
+
+    @Test
+    @Order(9)
+    public void staffCannotValidateSessionIfUserHasNoTicketsForThatEvent() {
+        // staff e un guest (senza comprare biglietti)
+        CreateUserDTO staffDto = new CreateUserDTO("NoTicketStaff", "TempSurname", "noticketstaff@test.it", "password");
+        String noTicketStaffToken = staffController.signup(staffDto);
+
+        CreateUserDTO guestDto = new CreateUserDTO("NoTicketGuest", "TempSurname", "noticketguest@test.it", "password");
+        String noTicketGuestToken = guestController.signup(guestDto);
+
+        StartVerificationSessionDTO startDTO = new StartVerificationSessionDTO(eventId);
+        SessionResponse sr = staffController.startVerificationSession(startDTO, noTicketStaffToken);
+
+        ScanStaffVerificationCodeDTO scanDTO = new ScanStaffVerificationCodeDTO();
+        scanDTO.setCode(sr.getVerificationCode());
+        guestController.scanStaffVerificationCode(scanDTO, noTicketGuestToken);
+
+        GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO(sr.getKey());
+        assertThrows(BadRequestException.class, () -> {
+            staffController.validateVerificationSession(dto, noTicketStaffToken);
+        }, "Mi aspetto eccezione perché l'utente non ha biglietti per questo evento");
     }
 }

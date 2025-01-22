@@ -1,4 +1,4 @@
-package org.swe.model;
+package org.swe.core.payment;
 
 public class CreditCardPayment implements PaymentStrategy {
     @Override

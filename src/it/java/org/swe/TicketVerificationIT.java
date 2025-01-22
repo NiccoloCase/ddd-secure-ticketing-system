@@ -27,8 +27,7 @@ import org.swe.core.DTO.ValidateVerificationSessionDTO;
 import org.swe.core.DTO.ScanStaffVerificationCodeDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
-import org.swe.model.PaymentMethod;
-import org.swe.model.StartVerificationSessionRes;
+import org.swe.model.StartVerificationSessionResult;
 import org.swe.model.Ticket;
 import org.swe.model.VerificationSessionResult;
 import org.swe.model.VerifySessionStatus;
@@ -45,7 +44,7 @@ public class TicketVerificationIT {
     private static String guestToken;
 
     private static Integer eventId;
-    private static StartVerificationSessionRes startVerificationSessionRes;
+    private static StartVerificationSessionResult startVerificationSessionResult;
 
     @BeforeAll
     public static void setUp() {
@@ -106,7 +105,7 @@ public class TicketVerificationIT {
         BuyTicketDTO buyTicketDTO = new BuyTicketDTO();
         buyTicketDTO.setEventId(eventId);
         buyTicketDTO.setQuantity(2);
-        buyTicketDTO.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+        buyTicketDTO.setPaymentMethod("CREDIT_CARD");
 
         Ticket purchased = guestController.buyTicket(buyTicketDTO, guestToken);
         assertNotNull(purchased, "The purchased ticket should not be null");
@@ -119,16 +118,16 @@ public class TicketVerificationIT {
     public void staffStartsVerificationSession() {
         StartVerificationSessionDTO startDTO = new StartVerificationSessionDTO(eventId);
 
-        startVerificationSessionRes = staffController.startVerificationSession(startDTO, staffToken);
+        startVerificationSessionResult = staffController.startVerificationSession(startDTO, staffToken);
 
-        assertNotNull(startVerificationSessionRes.getVerificationCode(), "Session verification code should not be null");
-        assertNotNull(startVerificationSessionRes.getKey(), "Verification session key should not be null");
+        assertNotNull(startVerificationSessionResult.getVerificationCode(), "Session verification code should not be null");
+        assertNotNull(startVerificationSessionResult.getKey(), "Verification session key should not be null");
     }
 
     @Test
     @Order(5)
     public void guestScansStaffCodeSuccessfully() {
-        String verificationCode = startVerificationSessionRes.getVerificationCode();
+        String verificationCode = startVerificationSessionResult.getVerificationCode();
         ScanStaffVerificationCodeDTO scanDTO = new ScanStaffVerificationCodeDTO();
         scanDTO.setCode(verificationCode);
 
@@ -139,7 +138,7 @@ public class TicketVerificationIT {
     @Test
     @Order(6)
     public void staffValidatesSession() {
-        String sessionKey = startVerificationSessionRes.getKey();
+        String sessionKey = startVerificationSessionResult.getKey();
 
         ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO(sessionKey);
         VerificationSessionResult result = staffController.validateVerificationSession(dto, staffToken);
@@ -161,7 +160,7 @@ public class TicketVerificationIT {
         assertNotNull(otherStaffToken);
 
         StartVerificationSessionDTO startDTO = new StartVerificationSessionDTO(eventId);
-        StartVerificationSessionRes otherStaffSession = staffController.startVerificationSession(startDTO, otherStaffToken);
+        StartVerificationSessionResult otherStaffSession = staffController.startVerificationSession(startDTO, otherStaffToken);
         String otherStaffSessionKey = otherStaffSession.getKey();
 
         // Trying to validate the session created by staff with another staff token
@@ -187,17 +186,17 @@ public class TicketVerificationIT {
         BuyTicketDTO buyTicketDTO = new BuyTicketDTO();
         buyTicketDTO.setEventId(eventId);
         buyTicketDTO.setQuantity(3);
-        buyTicketDTO.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+        buyTicketDTO.setPaymentMethod("CREDIT_CARD");
         guestController.buyTicket(buyTicketDTO, tempGuestToken);
 
         // Start the verification session
         StartVerificationSessionDTO startDTO = new StartVerificationSessionDTO(eventId);
-        StartVerificationSessionRes tempSession = staffController.startVerificationSession(startDTO, tempStaffToken);
+        StartVerificationSessionResult tempSession = staffController.startVerificationSession(startDTO, tempStaffToken);
         String sessionKey = tempSession.getKey();
         assertNotNull(sessionKey);
 
         ScanStaffVerificationCodeDTO scanDTO = new ScanStaffVerificationCodeDTO();
-        scanDTO.setCode(tempSession.getVerificationCode()); 
+        scanDTO.setCode(tempSession.getVerificationCode());
         guestController.scanStaffVerificationCode(scanDTO, tempGuestToken);
 
         // Staff validation ( I attempt )
@@ -226,7 +225,7 @@ public class TicketVerificationIT {
 
         // Start the verification session
         StartVerificationSessionDTO startDTO = new StartVerificationSessionDTO(eventId);
-        StartVerificationSessionRes sr = staffController.startVerificationSession(startDTO, noTicketStaffToken);
+        StartVerificationSessionResult sr = staffController.startVerificationSession(startDTO, noTicketStaffToken);
 
         // Guest scan
         ScanStaffVerificationCodeDTO scanDTO = new ScanStaffVerificationCodeDTO();

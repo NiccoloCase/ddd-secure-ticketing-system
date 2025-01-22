@@ -7,7 +7,7 @@ import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.ValidateVerificationSessionDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
-import org.swe.model.StartVerificationSessionRes;
+import org.swe.model.StartVerificationSessionResult;
 import org.swe.model.Ticket;
 import org.swe.model.User;
 import org.swe.model.VerificationSessionResult;
@@ -30,7 +30,7 @@ public class StaffController extends UserController {
      * @param token
      * @return Returns the session key and the JWT code for the QR-code scanning
      */
-    public StartVerificationSessionRes startVerificationSession(StartVerificationSessionDTO payload, String token) {
+    public StartVerificationSessionResult startVerificationSession(StartVerificationSessionDTO payload, String token) {
         validationInterceptor(payload);
         User staff = authInterceptor(token);
 

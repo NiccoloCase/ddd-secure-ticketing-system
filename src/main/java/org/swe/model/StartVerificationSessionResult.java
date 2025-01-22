@@ -1,10 +1,10 @@
 package org.swe.model;
 
-public class StartVerificationSessionRes {
+public class StartVerificationSessionResult {
     private final String key;
     private final String verificationCode;
 
-    public StartVerificationSessionRes(String key, String verificationCode) {
+    public StartVerificationSessionResult(String key, String verificationCode) {
         this.key = key;
         this.verificationCode = verificationCode;
     }

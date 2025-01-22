@@ -16,13 +16,13 @@ import org.swe.core.DAO.EventDAO;
 import org.swe.core.DAO.TicketDAO;
 import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.BuyTicketDTO;
+import org.swe.core.exceptions.ApplicationException;
 import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.model.Event;
-import org.swe.model.PaymentContext;
-import org.swe.model.PaymentMethod;
-import org.swe.model.PaymentStrategy;
+import org.swe.core.payment.PaymentContext;
+import org.swe.core.payment.PaymentStrategy;
 import org.swe.model.Ticket;
 import org.swe.model.User;
 
@@ -59,7 +59,7 @@ class GuestControllerTest {
             BuyTicketDTO dto = new BuyTicketDTO();
             dto.setEventId(1);
             dto.setQuantity(2);
-            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+            dto.setPaymentMethod("CREDIT_CARD");
 
             Event event = new Event.Builder()
                     .setId(1)
@@ -100,7 +100,7 @@ class GuestControllerTest {
             BuyTicketDTO dto = new BuyTicketDTO();
             dto.setEventId(1);
             dto.setQuantity(2);
-            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+            dto.setPaymentMethod("CREDIT_CARD");
 
             when(mockEventDAO.getEventById(1)).thenReturn(null);
 
@@ -112,7 +112,7 @@ class GuestControllerTest {
             BuyTicketDTO dto = new BuyTicketDTO();
             dto.setEventId(1);
             dto.setQuantity(10); // <-- ASKING 10 TICKETS
-            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+            dto.setPaymentMethod("CREDIT_CARD");
 
             Event event = new Event.Builder()
                     .setId(1)
@@ -131,7 +131,7 @@ class GuestControllerTest {
             BuyTicketDTO dto = new BuyTicketDTO();
             dto.setEventId(1);
             dto.setQuantity(2);
-            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+            dto.setPaymentMethod("CREDIT_CARD");
 
             Event event = new Event.Builder()
                     .setId(1)
@@ -154,7 +154,7 @@ class GuestControllerTest {
             BuyTicketDTO dto = new BuyTicketDTO();
             dto.setEventId(1);
             dto.setQuantity(2);
-            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+            dto.setPaymentMethod("CREDIT_CARD");
 
             Event event = new Event.Builder()
                     .setId(1)
@@ -187,7 +187,7 @@ class GuestControllerTest {
             BuyTicketDTO dto = new BuyTicketDTO();
             dto.setEventId(1);
             dto.setQuantity(2);
-            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+            dto.setPaymentMethod("CREDIT_CARD");
 
             when(mockAuthService.validateAccessToken("token")).thenThrow(new UnauthorizedException("Invalid token"));
 
@@ -199,18 +199,18 @@ class GuestControllerTest {
             BuyTicketDTO dto = new BuyTicketDTO();
             dto.setEventId(1);
             dto.setQuantity(2);
-            dto.setPaymentMethod(PaymentMethod.UNKNOWN); 
+            dto.setPaymentMethod("invalid payment");
 
-            assertThrows(NotFoundException.class, () -> guestController.buyTicket(dto, "token"));
+            assertThrows(ApplicationException.class, () -> guestController.buyTicket(dto, "token"));
         }
         
 
         @Test
-        void buyTicketShouldThrowExeptionIfPaymentGoesWrong(){
+        void buyTicketShouldThrowExceptionIfPaymentGoesWrong(){
             BuyTicketDTO dto = new BuyTicketDTO();
             dto.setEventId(1);
             dto.setQuantity(2);
-            dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
+            dto.setPaymentMethod("CREDIT_CARD");
 
             Event event = new Event.Builder()
                     .setId(1)

@@ -67,15 +67,7 @@ public class GuestController extends UserController {
         );
         
         if (!success) {
-            // rollback
-            eventDAO.updateEvent(
-                    event.getId(),
-                    event.getTitle(),
-                    event.getDescription(),
-                    event.getDate(),
-                    available,  // <-- restore original availability
-                    event.getTicketPrice()
-            );
+            // [rollback of payment]
             throw new BadRequestException("Failed to update event ticket availability.");
         }
         

@@ -57,7 +57,6 @@ public class DBManager {
                 statement.executeUpdate("DELETE FROM " + table);
             }
             connection.commit();
-            System.out.println("All tables cleared successfully.");
         } catch (SQLException e) {
             try {
                 connection.rollback(); // Rollback in case of error.
@@ -73,7 +72,4 @@ public class DBManager {
             }
         }
     }
-
-
-
 }

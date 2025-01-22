@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.swe.core.exceptions.InternalServerErrorException;
 import org.swe.core.utils.JWTUtility;
-import org.swe.model.SessionResponse;
+import org.swe.model.StartVerificationSessionRes;
 import org.swe.model.VerifySession;
 import org.swe.model.VerifySessionStatus;
 
@@ -14,13 +14,13 @@ public class ConcreteVerifySessionService implements VerifySessionService {
     private final Map<String, VerifySession> sessionData = new HashMap<>();
 
     @Override
-    public SessionResponse addToSession(VerifySession value) {
+    public StartVerificationSessionRes addToSession(VerifySession value) {
     String key = generateNewSessionKey();
     sessionData.put(key, value);
 
     String verificationCode = generateVerificationCode(key, value);
 
-    return new SessionResponse(key, verificationCode);
+    return new StartVerificationSessionRes(key, verificationCode);
 }
 
     @Override

@@ -1,4 +1,4 @@
-package org.swe.it.java.org.swe;
+package org.swe;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,7 +51,7 @@ public class EventIT {
      @Order(1)
      public void createEventShouldReturnTrue() {
           CreateEventDTO event = new CreateEventDTO("Event1", "Description", new Date(System.currentTimeMillis() + 86400000), 100, 10);
-          assertTrue(adminController.createEvent(event, token));
+          assertTrue(adminController.createEvent(event, token), "Event creation failed");
      }
      
 
@@ -59,7 +59,7 @@ public class EventIT {
      @Order(2)
      public void getAllEventsShouldReturnList() {
           List<Event> events = adminController.getAllEvents(token);
-          assertNotNull(events);
+          assertNotNull(events, "Events list is null");
      }
 
      @Test
@@ -69,7 +69,7 @@ public class EventIT {
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
                     UpdateEventDTO event = new UpdateEventDTO(e.getId(), "Event1", "Updated_Description", new Date(System.currentTimeMillis() + 86400000), 100, 15);
-                    assertTrue(adminController.updateEvent(event, token));
+                    assertTrue(adminController.updateEvent(event, token), "Event update failed");
                }
           }
      } 
@@ -81,7 +81,8 @@ public class EventIT {
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
                     UpdateEventDTO event = new UpdateEventDTO(e.getId(), "Event1", "Updated_Description", new Date(System.currentTimeMillis() + 86400000), 100, 15);
-                    assertThrows(UnauthorizedException.class, () -> adminController.updateEvent(event, token2));
+                    assertThrows(UnauthorizedException.class, () -> adminController.updateEvent(event, token2),
+                            "Unauthorized exception not thrown: user who is not admin should not be able to update event");
                }
           }
      }
@@ -93,7 +94,7 @@ public class EventIT {
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
                     AddStaffToEventDTO staff = new AddStaffToEventDTO(e.getId(), "federico.donati@pipus.it");
-                    assertThrows(UnauthorizedException.class, () -> adminController.addStaff(staff, token2));
+                    assertThrows(UnauthorizedException.class, () -> adminController.addStaff(staff, token2), "Unauthorized exception not thrown: user who is not admin should not be able to add staff to event");
                }
           }
      }
@@ -106,7 +107,7 @@ public class EventIT {
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
                     AddStaffToEventDTO staff = new AddStaffToEventDTO(e.getId(), "federico.donati@pipus.it");
-                    assertTrue(adminController.addStaff(staff, token));
+                    assertTrue(adminController.addStaff(staff, token), "Staff addition failed");
                 }
            }
      }
@@ -119,7 +120,7 @@ public class EventIT {
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
                     AddStaffToEventDTO staff = new AddStaffToEventDTO(e.getId(), "mago@wizards.it");
-                    assertThrows(NotFoundException.class, () -> adminController.addStaff(staff, token));
+                    assertThrows(NotFoundException.class, () -> adminController.addStaff(staff, token), "NotFoundException not thrown: email not found in the database");
                }
           }
      }
@@ -131,7 +132,7 @@ public class EventIT {
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
                     RemoveStaffFromEventDTO staff = new RemoveStaffFromEventDTO(e.getId(), "federico.donati@pipus.it");
-                    assertThrows(UnauthorizedException.class, () -> adminController.removeStaff(staff, token2));
+                    assertThrows(UnauthorizedException.class, () -> adminController.removeStaff(staff, token2), "Unauthorized exception not thrown: user who is not admin should not be able to remove staff from event");
                }
           }
      }
@@ -143,7 +144,7 @@ public class EventIT {
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
                     RemoveStaffFromEventDTO staff = new RemoveStaffFromEventDTO(e.getId(), "federico.donati@pipus.it");
-                    assertTrue(adminController.removeStaff(staff, token));
+                    assertTrue(adminController.removeStaff(staff, token), "Staff removal failed");
                }
           }
      }
@@ -155,7 +156,7 @@ public class EventIT {
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
                     RemoveStaffFromEventDTO staff = new RemoveStaffFromEventDTO(e.getId(), "mago@wizards.it");
-                    assertThrows(NotFoundException.class, () -> adminController.removeStaff(staff, token));
+                    assertThrows(NotFoundException.class, () -> adminController.removeStaff(staff, token), "NotFoundException not thrown: email not found in the database");
                }
           }
      }         
@@ -168,7 +169,7 @@ public class EventIT {
           List<Event> events = adminController.getAllEvents(token);
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
-                    assertThrows(UnauthorizedException.class, () -> adminController.deleteEvent(e.getId(), token2));
+                    assertThrows(UnauthorizedException.class, () -> adminController.deleteEvent(e.getId(), token2), "Unauthorized exception not thrown: user who is not admin should not be able to delete event");
                }
           }
      }
@@ -180,7 +181,7 @@ public class EventIT {
           List<Event> events = adminController.getAllEvents(token);
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
-                    assertTrue(adminController.deleteEvent(e.getId(), token));
+                    assertTrue(adminController.deleteEvent(e.getId(), token), "Event deletion failed");
                }
           }
      }

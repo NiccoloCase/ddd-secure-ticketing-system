@@ -7,7 +7,7 @@ import org.swe.core.DAO.UserDAO;
 import org.swe.core.DTO.GetVerificationSessionResultDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
-import org.swe.model.SessionResponse;
+import org.swe.model.StartVerificationSessionRes;
 import org.swe.model.Ticket;
 import org.swe.model.User;
 import org.swe.model.VerificationSessionResult;
@@ -25,7 +25,7 @@ public class StaffController extends UserController {
         this.ticketDAO = ticketDAO;
     }
 
-    public SessionResponse startVerificationSession(StartVerificationSessionDTO payload, String token) {
+    public StartVerificationSessionRes startVerificationSession(StartVerificationSessionDTO payload, String token) {
         validationInterceptor(payload);
         User staff = authInterceptor(token);
 

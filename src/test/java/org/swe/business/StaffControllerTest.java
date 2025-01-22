@@ -19,10 +19,9 @@ import org.swe.core.DTO.GetVerificationSessionResultDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.UnauthorizedException;
-import org.swe.model.SessionResponse;
+import org.swe.model.StartVerificationSessionRes;
 import org.swe.model.Ticket;
 import org.swe.model.User;
-import org.swe.model.VerificationSessionResult;
 import org.swe.model.VerifySession;
 import org.swe.model.VerifySessionStatus;
 
@@ -59,11 +58,11 @@ class StaffControllerTest {
         void startVerificationSession_ShouldReturnSessionResponse_IfValid() {
             StartVerificationSessionDTO dto = new StartVerificationSessionDTO(100);
             VerifySession verifySession = new VerifySession(10, 100);
-            SessionResponse fakeResponse = new SessionResponse("someKey", "someVerificationCode");
+            StartVerificationSessionRes fakeResponse = new StartVerificationSessionRes("someKey", "someVerificationCode");
             when(mockVerifySessionService.addToSession(any(VerifySession.class)))
                     .thenReturn(fakeResponse);
 
-            SessionResponse response = staffController.startVerificationSession(dto, "validToken");
+            StartVerificationSessionRes response = staffController.startVerificationSession(dto, "validToken");
 
             assertNotNull(response);
             assertEquals("someKey", response.getKey());

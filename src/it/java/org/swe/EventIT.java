@@ -10,12 +10,9 @@ import org.swe.core.DTO.UpdateEventDTO;
 import org.swe.core.DTO.CreateUserDTO;
 import org.swe.core.DBM.DBManager;
 import org.swe.core.DTO.RemoveStaffFromEventDTO;  
-import org.swe.core.DTO.CreateUserDTO;
-import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.model.Event;
-import org.swe.core.exceptions.InternalServerErrorException;
 import org.swe.core.DTO.AddStaffToEventDTO;
 
 import java.util.Date;

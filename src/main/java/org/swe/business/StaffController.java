@@ -15,7 +15,6 @@ import org.swe.model.VerifySession;
 import org.swe.model.VerifySessionStatus;
 
 public class StaffController extends UserController {
-
     private final VerifySessionService verifySessionService;
     private final TicketDAO ticketDAO;
 
@@ -25,6 +24,12 @@ public class StaffController extends UserController {
         this.ticketDAO = ticketDAO;
     }
 
+    /**
+     * Start a process of ticket verification
+     * @param payload
+     * @param token
+     * @return Returns the session key and the JWT code for the QR-code scanning
+     */
     public StartVerificationSessionRes startVerificationSession(StartVerificationSessionDTO payload, String token) {
         validationInterceptor(payload);
         User staff = authInterceptor(token);
@@ -36,6 +41,13 @@ public class StaffController extends UserController {
         return verifySessionService.addToSession(verifySession);
     }
 
+
+    /**
+     *
+     * @param payload
+     * @param token
+     * @return Returns if the verification process was successfully or not. Returns the identity of the user and the quantity of tickets.
+     */
     public VerificationSessionResult validateVerificationSession(GetVerificationSessionResultDTO payload, String token) throws BadRequestException {
         validationInterceptor(payload);
         User userStaff = authInterceptor(token);

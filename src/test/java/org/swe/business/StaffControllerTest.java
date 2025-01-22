@@ -30,15 +30,14 @@ class StaffControllerTest {
     private StaffController staffController;
     private AuthService mockAuthService;
     private VerifySessionService mockVerifySessionService;
-    private UserDAO mockUserDAO;
     private TicketDAO mockTicketDAO;
 
     @BeforeEach
     void setUp() {
         mockAuthService = mock(AuthService.class);
         mockVerifySessionService = mock(VerifySessionService.class);
-        mockUserDAO = mock(UserDAO.class);
         mockTicketDAO = mock(TicketDAO.class);
+        UserDAO mockUserDAO = mock(UserDAO.class);
 
         staffController = new StaffController(
                 mockAuthService,
@@ -55,7 +54,7 @@ class StaffControllerTest {
     class StartVerificationSessionTests {
 
         @Test
-        void startVerificationSession_ShouldReturnSessionResponse_IfValid() {
+        void startVerificationSessionShouldReturnSessionResponseIfValid() {
             StartVerificationSessionDTO dto = new StartVerificationSessionDTO(100);
             VerifySession verifySession = new VerifySession(10, 100);
             StartVerificationSessionRes fakeResponse = new StartVerificationSessionRes("someKey", "someVerificationCode");
@@ -71,7 +70,7 @@ class StaffControllerTest {
         }
 
         @Test
-        void startVerificationSession_ShouldThrowUnauthorizedException_IfTokenIsInvalid() {
+        void startVerificationSessionShouldThrowUnauthorizedExceptionIfTokenIsInvalid() {
             when(mockAuthService.validateAccessToken("invalidToken"))
                     .thenThrow(new UnauthorizedException("Invalid token"));
 
@@ -87,7 +86,7 @@ class StaffControllerTest {
     class ValidateVerificationSessionTests {
 
         @Test
-        void validateVerificationSession_ShouldThrowIfSessionDoesNotExist() {
+        void validateVerificationSessionShouldThrowIfSessionDoesNotExist() {
             GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("fakeSessionKey");
             when(mockVerifySessionService.getFromSession("fakeSessionKey"))
                     .thenThrow(new RuntimeException("DB access or session not found"));
@@ -98,7 +97,8 @@ class StaffControllerTest {
         }
 
         @Test
-        void validateVerificationSession_ShouldThrowIfSessionBelongsToAnotherStaff() {
+        void validateVerificationSessionShouldThrowIfSessionBelongsToAnotherStaff() {
+            // create fake session belonging to another staff
             GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
             VerifySession vs = new VerifySession(99, 100);
             vs.setStatus(VerifySessionStatus.PENDING);
@@ -113,7 +113,7 @@ class StaffControllerTest {
         }
 
         @Test
-        void validateVerificationSession_ShouldThrowIfSessionIsAlreadyValidated() {
+        void validateVerificationSessionShouldThrowIfSessionIsAlreadyValidated() {
             GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
             VerifySession vs = new VerifySession(10, 100);
 
@@ -128,7 +128,7 @@ class StaffControllerTest {
         }
 
         @Test
-        void validateVerificationSession_ShouldThrowIfSessionIsPendingOrNoGuest() {
+        void validateVerificationSessionShouldThrowIfSessionIsPendingOrNoGuest() {
             GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
             VerifySession vs = new VerifySession(10, 100);
             vs.setStatus(VerifySessionStatus.PENDING);
@@ -143,7 +143,7 @@ class StaffControllerTest {
         }
 
         @Test
-        void validateVerificationSession_ShouldThrowIfNoTicketsFound() {
+        void validateVerificationSessionShouldThrowIfNoTicketsFound() {
             GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
             VerifySession vs = new VerifySession(10, 100);
             vs.setStatus(VerifySessionStatus.PENDING);
@@ -152,7 +152,7 @@ class StaffControllerTest {
 
             when(mockVerifySessionService.getFromSession("mySessionKey")).thenReturn(vs);
 
-            ArrayList<Ticket> tickets = new ArrayList<>();
+            ArrayList<Ticket> tickets = new ArrayList<>(); // <------ EMPTY ARRAY OF TICKETS!
             when(mockTicketDAO.getTicketsByUserAndEvent(20, 100))
                     .thenReturn(tickets);
 
@@ -163,7 +163,7 @@ class StaffControllerTest {
         }
 
         @Test
-        void validateVerificationSession_ShouldThrowIfAllTicketsUsed() {
+        void validateVerificationSessionShouldThrowIfAllTicketsUsed() {
             GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
             VerifySession vs = new VerifySession(10, 100);
             vs.setStatus(VerifySessionStatus.PENDING);
@@ -175,7 +175,7 @@ class StaffControllerTest {
             Ticket usedTicket = new Ticket(1, 20, 100, 2, true);
             when(mockTicketDAO.getTicketsByUserAndEvent(20, 100)).thenReturn(new ArrayList<Ticket>() {
                 {
-                    add(usedTicket);
+                    add(usedTicket); // <-- THE ONLY TICKET THE USER HAS IS ALREADY USED!
                 }
             });
 

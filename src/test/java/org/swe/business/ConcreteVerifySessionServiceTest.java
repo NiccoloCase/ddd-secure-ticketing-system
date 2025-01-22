@@ -29,6 +29,7 @@ class ConcreteVerifySessionServiceTest {
 
         VerifySession retrievedSession = service.getFromSession(key);
         assertNotNull(retrievedSession, "Session should be retrieved successfully");
+        assertEquals(retrievedSession.getStatus(), VerifySessionStatus.WAITING_FOR_GUEST, "The status should be WAITING_FOR_GUEST");
         assertEquals(session, retrievedSession, "The added session and retrieved session should be the same");
     }
 

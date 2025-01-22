@@ -30,18 +30,18 @@ class GuestControllerTest {
 
     private GuestController guestController;
     private AuthService mockAuthService;
-    private VerifySessionService mockVerifySessionService;
     private EventDAO mockEventDAO;
     private TicketDAO mockTicketDAO;
-    private UserDAO mockUserDAO;
 
     @BeforeEach
     void setUp() {
+        // Mock dependencies
+        VerifySessionService mockVerifySessionService = mock(VerifySessionService.class);
+        UserDAO mockUserDAO = mock(UserDAO.class);
         mockAuthService = mock(AuthService.class);
-        mockVerifySessionService = mock(VerifySessionService.class);
         mockEventDAO = mock(EventDAO.class);
         mockTicketDAO = mock(TicketDAO.class);
-        mockUserDAO = mock(UserDAO.class);
+      
 
         guestController = new GuestController(mockAuthService, mockVerifySessionService, mockEventDAO, mockTicketDAO,
                 mockUserDAO);
@@ -74,7 +74,8 @@ class GuestControllerTest {
             PaymentStrategy paymentStrategy = mock(PaymentStrategy.class);
             when(paymentStrategy.processPayment(20)).thenReturn(true);
 
-            PaymentContext paymentContext = new PaymentContext();
+            PaymentContext paymentContext;
+            paymentContext = new PaymentContext();
             paymentContext.setPaymentStrategy(paymentStrategy);
 
             when(mockEventDAO.updateEvent(
@@ -110,7 +111,7 @@ class GuestControllerTest {
         void buyTicketShouldThrowBadRequestExceptionIfNotEnoughTicketsAvailable() {
             BuyTicketDTO dto = new BuyTicketDTO();
             dto.setEventId(1);
-            dto.setQuantity(10);
+            dto.setQuantity(10); // <-- ASKING 10 TICKETS
             dto.setPaymentMethod(PaymentMethod.CREDIT_CARD);
 
             Event event = new Event.Builder()
@@ -118,7 +119,7 @@ class GuestControllerTest {
                     .setTitle("title")
                     .setDescription("description")
                     .setDate(Date.from(LocalDate.of(2025, 12, 12).atStartOfDay(ZoneId.systemDefault()).toInstant()))
-                    .setTicketsAvailable(5)
+                    .setTicketsAvailable(5) // <-- ONLY 5 TICKETS AVAILABLE
                     .build();
             when(mockEventDAO.getEventById(1)).thenReturn(event);
 

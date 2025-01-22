@@ -46,9 +46,9 @@ public class GuestController extends UserController {
             throw new BadRequestException("Not enough tickets available.");
         }
         
-        // Processo pagamento
-        PaymentContext paymentContext = new PaymentContext();
-        PaymentStrategy paymentStrategy = PaymentStrategyFactory.getPaymentStrategy(dto.getPaymentMethod());
+        // PAYMENT
+        PaymentContext paymentContext = new PaymentContext(); // Create strategy context
+        PaymentStrategy paymentStrategy = PaymentStrategyFactory.getPaymentStrategy(dto.getPaymentMethod()); // Get strategy from factory
         paymentContext.setPaymentStrategy(paymentStrategy);
         boolean paymentSuccess = paymentContext.executePayment(event.getTicketPrice() * dto.getQuantity());
         
@@ -56,7 +56,7 @@ public class GuestController extends UserController {
             throw new BadRequestException("Payment failed. Please try again.");
         }
         
-        // Aggiorna disponibilità biglietti
+        // Update the availability of tickets
         boolean success = eventDAO.updateEvent(
             event.getId(),
             event.getTitle(),
@@ -67,20 +67,27 @@ public class GuestController extends UserController {
         );
         
         if (!success) {
-            // TODO: Se l'aggiornamento fallisce, dovremmo gestire il rollback del pagamento
+            // rollback
+            eventDAO.updateEvent(
+                    event.getId(),
+                    event.getTitle(),
+                    event.getDescription(),
+                    event.getDate(),
+                    available,  // <-- restore original availability
+                    event.getTicketPrice()
+            );
             throw new BadRequestException("Failed to update event ticket availability.");
         }
         
-        // Crea il ticket e verifica che sia stato creato correttamente
+        // Create the ticket and return it
         Ticket ticket = ticketDAO.createTicket(user.getId(), dto.getEventId(), dto.getQuantity());
         if (ticket == null) {
-            // Rollback delle modifiche
+            // rollback
             eventDAO.updateEvent(
                 event.getId(),
                 event.getTitle(),
                 event.getDescription(),
-                event.getDate(),
-                available,  // ripristina disponibilità originale
+                event.getDate(), available,  // <-- restore original availability
                 event.getTicketPrice()
             );
             throw new RuntimeException("Failed to create ticket");

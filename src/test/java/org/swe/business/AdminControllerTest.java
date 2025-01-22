@@ -44,8 +44,6 @@ public class AdminControllerTest {
         this.mockStaffDAO = mock(StaffDAO.class);
         AuthService mockAuthService = mock(AuthService.class);
         adminController = new AdminController(mockAuthService, mockEventDAO, mockUserDAO, mockAdminDAO, mockStaffDAO);
-
-        // Mock auth
         when(mockAuthService.validateAccessToken("token")).thenReturn(1);
         when(mockUserDAO.getUserById(1)).thenReturn(new User("name", "surname", "password", "email", 1));
     }

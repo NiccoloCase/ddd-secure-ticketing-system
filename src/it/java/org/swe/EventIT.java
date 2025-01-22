@@ -5,15 +5,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.swe.business.ApplicationManager;
 import org.swe.business.AdminController;
-import org.swe.core.DTO.CreateEventDTO;
-import org.swe.core.DTO.UpdateEventDTO;
-import org.swe.core.DTO.CreateUserDTO;
+import org.swe.business.GuestController;
+import org.swe.core.DTO.*;
 import org.swe.core.DBM.DBManager;
-import org.swe.core.DTO.RemoveStaffFromEventDTO;  
+import org.swe.core.exceptions.ApplicationException;
 import org.swe.core.exceptions.NotFoundException;
 import org.swe.core.exceptions.UnauthorizedException;
 import org.swe.model.Event;
-import org.swe.core.DTO.AddStaffToEventDTO;
+import org.swe.model.Staff;
+import org.swe.model.Ticket;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +25,7 @@ import java.util.List;
 public class EventIT {
 
      static AdminController adminController;
+     static GuestController guestController;
      static String token;
      static String token2;
 
@@ -32,6 +33,7 @@ public class EventIT {
      public static void setUp() {
          ApplicationManager app = new ApplicationManager();
          adminController = app.getAdminController();
+         guestController = app.getGuestController();
 
          DBManager.getInstance().clearTables();
          System.out.println("Tables cleared");
@@ -174,9 +176,80 @@ public class EventIT {
           }
      }
 
+     @Test
+     @Order(13)
+     public void eventPurchaseShouldDecrementAvailableTickets() {
+          // event creation
+          CreateEventDTO event = new CreateEventDTO("Event1", "Description", new Date(System.currentTimeMillis() + 86400000), 100, 10);
+          assertTrue(adminController.createEvent(event, token), "Event creation failed");
+          List<Event> events = adminController.getAllEvents(token);
+         assertFalse(events.isEmpty(), "Event retrieval failed");
+          // event purchase
+          Integer eventId = events.get(0).getId();
+          BuyTicketDTO buyTicketDTO = new BuyTicketDTO();
+          buyTicketDTO.setEventId(eventId);
+          buyTicketDTO.setQuantity(1);
+          buyTicketDTO.setPaymentMethod("GOOGLE_PAY");
+
+          Ticket ticket = guestController.buyTicket(buyTicketDTO, token);
+          assertNotNull(ticket, "Ticket purchase failed");
+
+          // check if available tickets are decremented
+          Event event2 = adminController.getEventById(eventId, token);
+          assertEquals(99, event2.getTicketsAvailable(), "Available tickets not decremented");
+
+     }
 
      @Test
-     @Order(12)
+     @Order(14)
+     public void eventPurchaseShouldFailIsNotEnoughTickets() {
+          int ticketsAvailable = 10;
+          // event creation
+          CreateEventDTO event = new CreateEventDTO("Event1", "Description", new Date(System.currentTimeMillis() + 86400000), ticketsAvailable, 10);
+          assertTrue(adminController.createEvent(event, token), "Event creation failed");
+          List<Event> events = adminController.getAllEvents(token);
+          assertFalse(events.isEmpty(), "Event retrieval failed");
+          // event purchase
+          BuyTicketDTO buyTicketDTO = new BuyTicketDTO();
+          buyTicketDTO.setEventId(events.get(0).getId());
+          buyTicketDTO.setQuantity(ticketsAvailable+1);
+
+          assertThrows(ApplicationException.class, () -> guestController.buyTicket(buyTicketDTO, token), "NotFoundException not thrown: not enough tickets available");
+
+     }
+
+     @Test
+     @Order(15)
+     public void getEventByIdsShouldPopulateAdminsAndStaff(){
+          // get all admin events
+          List<Event> events = adminController.getAllEvents(token);
+          assertFalse(events.isEmpty(), "Event retrieval failed");
+          Integer eventId = events.get(0).getId();
+
+          // populate staff
+          AddStaffToEventDTO staff = new AddStaffToEventDTO(eventId, "federico.donati@pipus.it");
+          adminController.addStaff(staff, token);
+
+          // get event by id
+          Event event = adminController.getEventById(events.get(0).getId(), token);
+          assertNotNull(event, "Get event by id failed");
+          // check if admins and staff are populated
+          assertEquals(1, event.getAdmins().size(), "Admins not populated");
+          assertFalse(event.getStaff().isEmpty(), "Staff not populated");
+
+          // check if staff is correct
+          boolean found = false;
+          for (Staff s : event.getStaff()) {
+               if (s.getEmail().equals("federico.donati@pipus.it")) {
+                    found = true;
+                    break;
+               }
+          }
+          assertTrue(found, "Staff not populated correctly");
+     }
+
+     @Test
+     @Order(16)
      public void deleteEventShouldReturnTrue() {
           List<Event> events = adminController.getAllEvents(token);
           for(Event e : events) {
@@ -185,4 +258,6 @@ public class EventIT {
                }
           }
      }
+
+
 }

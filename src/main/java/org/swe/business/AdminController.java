@@ -129,7 +129,11 @@ public class AdminController extends UserController {
             throw new RuntimeException("Failed to remove staff from event.");
         }
 
-        return success;
+        return true;
     }
 
+    public Event getEventById(int eventId, String token) {
+        authInterceptor(token);
+        return eventDAO.getEventById(eventId);
+    }
 }

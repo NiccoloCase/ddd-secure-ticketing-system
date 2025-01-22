@@ -73,6 +73,7 @@ public class Event {
                 '}';
     }
 
+
     public static class Builder {
         private int id;
         private String title;

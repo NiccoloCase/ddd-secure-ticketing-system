@@ -23,7 +23,7 @@ import org.swe.core.DBM.DBManager;
 import org.swe.core.DTO.BuyTicketDTO;
 import org.swe.core.DTO.CreateEventDTO;
 import org.swe.core.DTO.CreateUserDTO;
-import org.swe.core.DTO.GetVerificationSessionResultDTO;
+import org.swe.core.DTO.ValidateVerificationSessionDTO;
 import org.swe.core.DTO.ScanStaffVerificationCodeDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
@@ -141,7 +141,7 @@ public class TicketVerificationIT {
     public void staffValidatesSession() {
         String sessionKey = startVerificationSessionRes.getKey();
 
-        GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO(sessionKey);
+        ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO(sessionKey);
         VerificationSessionResult result = staffController.validateVerificationSession(dto, staffToken);
 
         assertNotNull(result, "Result should not be null");
@@ -165,7 +165,7 @@ public class TicketVerificationIT {
         String otherStaffSessionKey = otherStaffSession.getKey();
 
         // Trying to validate the session created by staff with another staff token
-        GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO(otherStaffSessionKey);
+        ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO(otherStaffSessionKey);
 
         assertThrows(BadRequestException.class, () -> {
             staffController.validateVerificationSession(dto, staffToken);
@@ -201,7 +201,7 @@ public class TicketVerificationIT {
         guestController.scanStaffVerificationCode(scanDTO, tempGuestToken);
 
         // Staff validation ( I attempt )
-        GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO(sessionKey);
+        ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO(sessionKey);
         VerificationSessionResult result = staffController.validateVerificationSession(dto, tempStaffToken);
         assertNotNull(result);
 
@@ -235,7 +235,7 @@ public class TicketVerificationIT {
 
 
         // Failure
-        GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO(sr.getKey());
+        ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO(sr.getKey());
         assertThrows(BadRequestException.class, () -> {
             staffController.validateVerificationSession(dto, noTicketStaffToken);
         }, "Guest has no tickets for the event: validation should fail");

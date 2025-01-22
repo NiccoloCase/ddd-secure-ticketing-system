@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.swe.core.DAO.TicketDAO;
 import org.swe.core.DAO.UserDAO;
-import org.swe.core.DTO.GetVerificationSessionResultDTO;
+import org.swe.core.DTO.ValidateVerificationSessionDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
 import org.swe.model.StartVerificationSessionRes;
@@ -48,7 +48,7 @@ public class StaffController extends UserController {
      * @param token
      * @return Returns if the verification process was successfully or not. Returns the identity of the user and the quantity of tickets.
      */
-    public VerificationSessionResult validateVerificationSession(GetVerificationSessionResultDTO payload, String token) throws BadRequestException {
+    public VerificationSessionResult validateVerificationSession(ValidateVerificationSessionDTO payload, String token) throws BadRequestException {
         validationInterceptor(payload);
         User userStaff = authInterceptor(token);
         VerifySession verifySession = null;

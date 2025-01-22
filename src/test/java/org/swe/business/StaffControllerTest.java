@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.swe.core.DAO.TicketDAO;
 import org.swe.core.DAO.UserDAO;
-import org.swe.core.DTO.GetVerificationSessionResultDTO;
+import org.swe.core.DTO.ValidateVerificationSessionDTO;
 import org.swe.core.DTO.StartVerificationSessionDTO;
 import org.swe.core.exceptions.BadRequestException;
 import org.swe.core.exceptions.UnauthorizedException;
@@ -87,7 +87,7 @@ class StaffControllerTest {
 
         @Test
         void validateVerificationSessionShouldThrowIfSessionDoesNotExist() {
-            GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("fakeSessionKey");
+            ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO("fakeSessionKey");
             when(mockVerifySessionService.getFromSession("fakeSessionKey"))
                     .thenThrow(new RuntimeException("DB access or session not found"));
 
@@ -99,7 +99,7 @@ class StaffControllerTest {
         @Test
         void validateVerificationSessionShouldThrowIfSessionBelongsToAnotherStaff() {
             // create fake session belonging to another staff
-            GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
+            ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO("mySessionKey");
             VerifySession vs = new VerifySession(99, 100);
             vs.setStatus(VerifySessionStatus.PENDING);
             vs.linkSessionToUser(new User("Guest", "Surname", "pwd", "guest@test.it", 20));
@@ -114,7 +114,7 @@ class StaffControllerTest {
 
         @Test
         void validateVerificationSessionShouldThrowIfSessionIsAlreadyValidated() {
-            GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
+            ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO("mySessionKey");
             VerifySession vs = new VerifySession(10, 100);
 
             vs.linkSessionToUser(new User("Guest", "Surname", "pwd", "guest@test.it", 20));
@@ -129,7 +129,7 @@ class StaffControllerTest {
 
         @Test
         void validateVerificationSessionShouldThrowIfSessionIsPendingOrNoGuest() {
-            GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
+            ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO("mySessionKey");
             VerifySession vs = new VerifySession(10, 100);
             vs.setStatus(VerifySessionStatus.PENDING);
             vs.linkSessionToUser(null);
@@ -144,7 +144,7 @@ class StaffControllerTest {
 
         @Test
         void validateVerificationSessionShouldThrowIfNoTicketsFound() {
-            GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
+            ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO("mySessionKey");
             VerifySession vs = new VerifySession(10, 100);
             vs.setStatus(VerifySessionStatus.PENDING);
             User guestUser = new User("Guest", "Surname", "pwd", "guest@test.it", 20);
@@ -164,7 +164,7 @@ class StaffControllerTest {
 
         @Test
         void validateVerificationSessionShouldThrowIfAllTicketsUsed() {
-            GetVerificationSessionResultDTO dto = new GetVerificationSessionResultDTO("mySessionKey");
+            ValidateVerificationSessionDTO dto = new ValidateVerificationSessionDTO("mySessionKey");
             VerifySession vs = new VerifySession(10, 100);
             vs.setStatus(VerifySessionStatus.PENDING);
             User guestUser = new User("Guest", "Surname", "pwd", "guest@test.it", 20);

@@ -2,12 +2,12 @@ package org.swe.core.DTO;
 
 import jakarta.validation.constraints.NotNull;
 
-public class GetVerificationSessionResultDTO {
+public class ValidateVerificationSessionDTO {
 
     @NotNull
     private String sessionKey;
 
-    public GetVerificationSessionResultDTO(String sessionKey) {
+    public ValidateVerificationSessionDTO(String sessionKey) {
         this.sessionKey = sessionKey;
     }
 

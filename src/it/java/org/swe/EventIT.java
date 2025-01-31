@@ -38,9 +38,9 @@ public class EventIT {
          DBManager.getInstance().clearTables();
          System.out.println("Tables cleared");
 
-         CreateUserDTO user = new CreateUserDTO("Mario", "Rossi", "simone.pellici@Stella.it", "password");
+         CreateUserDTO user = new CreateUserDTO("Mario", "Rossi", "simone.stella@gmail.it", "password");
          token = adminController.signup(user);
-         CreateUserDTO user2 = new CreateUserDTO("Mario", "Bianchi", "federico.donati@pipus.it", "password");
+         CreateUserDTO user2 = new CreateUserDTO("Mario", "Bianchi", "federico.dona@gmail.it", "password");
          token2 = adminController.signup(user2);
      }
 
@@ -95,7 +95,7 @@ public class EventIT {
           List<Event> events = adminController.getAllEvents(token);
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
-                    AddStaffToEventDTO staff = new AddStaffToEventDTO(e.getId(), "federico.donati@pipus.it");
+                    AddStaffToEventDTO staff = new AddStaffToEventDTO(e.getId(), "federico.dona@gmail.it");
                     assertThrows(UnauthorizedException.class, () -> adminController.addStaff(staff, token2), "Unauthorized exception not thrown: user who is not admin should not be able to add staff to event");
                }
           }
@@ -108,7 +108,7 @@ public class EventIT {
           List<Event> events = adminController.getAllEvents(token);
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
-                    AddStaffToEventDTO staff = new AddStaffToEventDTO(e.getId(), "federico.donati@pipus.it");
+                    AddStaffToEventDTO staff = new AddStaffToEventDTO(e.getId(), "federico.dona@gmail.it");
                     assertTrue(adminController.addStaff(staff, token), "Staff addition failed");
                 }
            }
@@ -133,7 +133,7 @@ public class EventIT {
           List<Event> events = adminController.getAllEvents(token);
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
-                    RemoveStaffFromEventDTO staff = new RemoveStaffFromEventDTO(e.getId(), "federico.donati@pipus.it");
+                    RemoveStaffFromEventDTO staff = new RemoveStaffFromEventDTO(e.getId(), "federico.dona@gmail.it");
                     assertThrows(UnauthorizedException.class, () -> adminController.removeStaff(staff, token2), "Unauthorized exception not thrown: user who is not admin should not be able to remove staff from event");
                }
           }
@@ -145,7 +145,7 @@ public class EventIT {
           List<Event> events = adminController.getAllEvents(token);
           for(Event e : events) {
                if(e.getTitle().equals("Event1")) {
-                    RemoveStaffFromEventDTO staff = new RemoveStaffFromEventDTO(e.getId(), "federico.donati@pipus.it");
+                    RemoveStaffFromEventDTO staff = new RemoveStaffFromEventDTO(e.getId(), "federico.dona@gmail.it");
                     assertTrue(adminController.removeStaff(staff, token), "Staff removal failed");
                }
           }
@@ -227,7 +227,7 @@ public class EventIT {
           Integer eventId = events.get(0).getId();
 
           // populate staff
-          AddStaffToEventDTO staff = new AddStaffToEventDTO(eventId, "federico.donati@pipus.it");
+          AddStaffToEventDTO staff = new AddStaffToEventDTO(eventId, "federico.dona@gmail.it");
           adminController.addStaff(staff, token);
 
           // get event by id
@@ -240,7 +240,7 @@ public class EventIT {
           // check if staff is correct
           boolean found = false;
           for (Staff s : event.getStaff()) {
-               if (s.getEmail().equals("federico.donati@pipus.it")) {
+               if (s.getEmail().equals("federico.dona@gmail.it")) {
                     found = true;
                     break;
                }
